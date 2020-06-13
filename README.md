@@ -6,7 +6,16 @@ This repo is using cabal and nix. Once you run the nix shell expression you
 should be set up to compile the content of this repo.
 
 ```
+nix-shell
 cabal run
+```
+
+If you want to run the jupyter notebooks, you can do so as follows.
+
+```
+cd jupyter
+nix-shell jupyter.nix
+jupyter-notebook
 ```
 
 
