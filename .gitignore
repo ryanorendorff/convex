@@ -30,7 +30,6 @@ ipynb_checkpoints/
 .#*
 .coverage
 .pytest_cache
-src
 
 *.swp
 *.map
