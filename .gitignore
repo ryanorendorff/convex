@@ -86,3 +86,5 @@ result
 
 # Editor files
 *.swp
+
+.vscode/
