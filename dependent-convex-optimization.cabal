@@ -1,0 +1,91 @@
+cabal-version:       2.2
+
+name:                dependently-typed-convex-optimization
+version:             0.1.0.0
+synopsis:            Dependently typed convex optimization for LambdaConf 2019
+
+homepage:            https://github.com/ryanorendorff/lc-2019-dependently-typed-convex-optimization
+license:             GPL-3.0-only
+license-file:        LICENSE
+author:              Ryan Orendorff
+maintainer:          ryan@orendorff.io
+copyright:           2019 Ryan Orendorff
+                     
+category:            Math
+
+extra-source-files:  README.md
+
+library
+  -- Modules exported by the library.
+  exposed-modules:
+    Numeric.LinearAlgebra.MatrixFree
+    Numeric.LinearProgramming.L1.Static
+    ControlSystems.DynamicSystems.Conversions
+    ControlSystems.DynamicSystems.Conversions.Static
+
+  -- Modules included in this library but not exported.
+  -- other-modules:
+
+  -- LANGUAGE extensions used by modules in this package.
+  -- other-extensions:
+
+  -- Other library packages from which modules are imported.
+  build-depends:
+      ghc-typelits-natnormalise
+    , ghc-typelits-knownnat
+    , gnuplot
+    , hmatrix
+    , hmatrix-glpk
+    , vector
+    , random
+    , base >=4.10.1.0
+                
+
+  -- Directories containing source files.
+  hs-source-dirs:      src
+
+  -- Base language which the package is written in.
+  default-language:    Haskell2010
+  ghc-options:
+    -Wall
+    -Wcompat
+    -Wincomplete-record-updates
+    -Wincomplete-uni-patterns
+    -Wredundant-constraints
+    -Wno-orphans
+
+
+executable dependently-typed-convex-optimization
+  -- .hs or .lhs file containing the Main module.
+  main-is:             Main.hs
+
+  -- Modules included in this executable, other than Main.
+  -- other-modules:
+
+  -- LANGUAGE extensions used by modules in this package.
+  -- other-extensions:
+
+  -- Other library packages from which modules are imported.
+  build-depends:
+      ghc-typelits-natnormalise
+    , ghc-typelits-knownnat
+    , gnuplot
+    , hmatrix
+    , hmatrix-glpk
+    , vector
+    , random
+    , dependently-typed-convex-optimization
+    , base >=4.10.1.0
+
+  -- Directories containing source files.
+  hs-source-dirs:      main
+
+  -- Base language which the package is written in.
+  default-language:    Haskell2010
+  ghc-options:
+    -Wall
+    -Wcompat
+    -Wincomplete-record-updates
+    -Wincomplete-uni-patterns
+    -Wredundant-constraints
+    -threaded
