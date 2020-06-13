@@ -25,11 +25,14 @@ jupyter-notebook
 - Adding in new solvers, such as a second order cone solver.
 - Adding in capabilities to generate the matrices for certain problems with known structure, such as Model Predictive Control (MPC).
 - Matrix free SVD calculation.
+- Use linear types! Potentially can get some more safety (and eventually
+  performance?) by constraining that the input matrices are used once.
 
 
 These ones I would love to get to but would probably be a separate project
 
-- Create a framework to optimize the linear algebra when certain properties of a matrix are know (idempotency, hermitian, etc).
+- Create a framework to optimize the linear algebra when certain properties of
+  a matrix are know (idempotency, hermitian, etc).
 - Perform some rewrites/fusion for the matrix free forms from a given expression
 - Verify that the rewrites are sound using Agda.
 
