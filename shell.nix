@@ -51,6 +51,7 @@ let
     cabal-install
 
     # Editor tools (for use with the Spacemacs Haskell layer)
+    brittany
     haskintex
     hasktags
     hlint
