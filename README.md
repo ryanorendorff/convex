@@ -17,6 +17,7 @@ cabal run
 - Adding in capabilities to generate the matrices for certain problems with known structure, such as Model Predictive Control (MPC).
 - Create a framework to optimize the linear algebra when certain properties of a matrix are know (idempotency, hermitian, etc).
 - Perform some rewrites/fusion for the matrix free forms from a given expression
+- Matrix free SVD calculation.
 
 
 ## Abstract from LambdaConf 2019 talk
