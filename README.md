@@ -24,9 +24,14 @@ jupyter-notebook
 - Making sure the examples in the repo and jupyter notebooks run.
 - Adding in new solvers, such as a second order cone solver.
 - Adding in capabilities to generate the matrices for certain problems with known structure, such as Model Predictive Control (MPC).
+- Matrix free SVD calculation.
+
+
+These ones I would love to get to but would probably be a separate project
+
 - Create a framework to optimize the linear algebra when certain properties of a matrix are know (idempotency, hermitian, etc).
 - Perform some rewrites/fusion for the matrix free forms from a given expression
-- Matrix free SVD calculation.
+- Verify that the rewrites are sound using Agda.
 
 
 ## Abstract from LambdaConf 2019 talk
