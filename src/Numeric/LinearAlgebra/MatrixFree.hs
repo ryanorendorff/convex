@@ -20,8 +20,8 @@ import Numeric.LinearAlgebra.Static
 data LinearMap (m :: Nat) (n :: Nat) where
   -- | Construct a LinearMap from a forward and adjoint function
   LinearMap :: (KnownNat m, KnownNat n) =>
-                    (R n -> R m) -- ^ Forward fucntion
-                 -> (R m -> R n) -- ^ Adjoint function
+                    (R n -> R m) 
+                 -> (R m -> R n) 
                  -> LinearMap m n
 
 fromL :: (KnownNat m, KnownNat n) => L m n -> LinearMap m n
