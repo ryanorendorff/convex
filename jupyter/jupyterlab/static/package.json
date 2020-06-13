@@ -102,7 +102,7 @@
         "sanitize-html": "~1.18.2",
         "semver": "^5.5.0",
         "url-parse": "~1.4.3",
-        "xterm": "~3.3.0",
+        "xterm": "~4.7.0",
         "jupyterlab-ihaskell": "file:../extensions/jupyterlab-ihaskell-0.0.8.tgz",
         "jupyterlab_bokeh": "file:../extensions/jupyterlab_bokeh-0.6.3.tgz"
     },
