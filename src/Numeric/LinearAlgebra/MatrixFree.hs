@@ -1,12 +1,11 @@
-{-# LANGUAGE GADTs                  #-}
-{-# LANGUAGE DataKinds              #-}
-{-# LANGUAGE KindSignatures         #-}
+{-# LANGUAGE DataKinds             #-}
+{-# LANGUAGE GADTs                 #-}
+{-# LANGUAGE KindSignatures        #-}
 
-{-# LANGUAGE ScopedTypeVariables    #-}
-{-# LANGUAGE TypeOperators          #-}
-{-# LANGUAGE ViewPatterns           #-}
-{-# LANGUAGE MultiParamTypeClasses  #-}
-{-# LANGUAGE FlexibleContexts       #-}
+{-# LANGUAGE FlexibleContexts      #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE ScopedTypeVariables   #-}
+{-# LANGUAGE TypeOperators         #-}
 
 {-# OPTIONS_GHC -fplugin GHC.TypeLits.KnownNat.Solver #-}
 {-# OPTIONS_GHC -fplugin GHC.TypeLits.Normalise #-}
