@@ -18,11 +18,12 @@ module Numeric.LinearAlgebra.MatrixFree
     )
 where
 
-import           GHC.TypeLits
-import           Numeric.LinearAlgebra.Static
-import           Numeric.LinearAlgebra          ( Transposable )
 import           Data.Proxy                     ( Proxy(..) )
 import           Data.Type.Equality             ( (:~:)(Refl) )
+import           GHC.TypeLits
+import           Numeric.LinearAlgebra          ( Transposable )
+import           Numeric.LinearAlgebra.Static
+import qualified Data.Vector.Storable          as V
 
 
 data LinearMap (m :: Nat) (n :: Nat) where
@@ -129,4 +130,4 @@ innerDims
     -> Maybe (LinearMap m n, LinearMap p q, n :~: p)
 innerDims a@(LinearMap fa ba) b@(LinearMap fb bb) = do
     Refl <- sameNat (Proxy :: Proxy n) (Proxy :: Proxy p)
-    return ((LinearMap fa ba), (LinearMap fb bb), Refl)
+    return (LinearMap fa ba, LinearMap fb bb, Refl)
