@@ -17,10 +17,10 @@ module Numeric.LinearAlgebra.MatrixFree
     , (+#)
     , (<#>)
     , avgRepeatedFree
-    , exactDims
+    , exactDimsFree
     , eyeFree
     , fromL
-    , innerDims
+    , innerDimsFree
     , toL
     )
 where
@@ -109,22 +109,22 @@ removeAvg :: (KnownNat n) => LinearMap n n
 removeAvg = eyeFree +# ((-1) *# avgRepeatedFree)
 
 
-exactDims
+exactDimsFree
     :: forall n m j k
      . (KnownNat n, KnownNat m, KnownNat j, KnownNat k)
     => LinearMap m n
     -> Maybe (LinearMap j k)
-exactDims m@(LinearMap f b) = do
+exactDimsFree m@(LinearMap f b) = do
     Refl <- sameNat (Proxy :: Proxy m) (Proxy :: Proxy j)
     Refl <- sameNat (Proxy :: Proxy n) (Proxy :: Proxy k)
     return $ LinearMap f b
 
-innerDims
+innerDimsFree
     :: forall n m p q
      . (KnownNat m, KnownNat n, KnownNat p, KnownNat q)
     => LinearMap m n
     -> LinearMap p q
     -> Maybe (LinearMap m n, LinearMap p q, n :~: p)
-innerDims a@(LinearMap fa ba) b@(LinearMap fb bb) = do
+innerDimsFree a@(LinearMap fa ba) b@(LinearMap fb bb) = do
     Refl <- sameNat (Proxy :: Proxy n) (Proxy :: Proxy p)
     return (LinearMap fa ba, LinearMap fb bb, Refl)
