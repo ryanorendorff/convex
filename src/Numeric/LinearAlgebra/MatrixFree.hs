@@ -16,6 +16,10 @@ module Numeric.LinearAlgebra.MatrixFree
     , toL
     , eyeFree
     , avgRepeatedFree
+    , (##>)
+    , (<#>)
+    , (+#)
+    , (*#)
     )
 where
 
