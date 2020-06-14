@@ -12,14 +12,16 @@
 
 module Numeric.LinearAlgebra.MatrixFree
     ( LinearMap(..)
-    , fromL
-    , toL
-    , eyeFree
-    , avgRepeatedFree
     , (##>)
-    , (<#>)
-    , (+#)
     , (*#)
+    , (+#)
+    , (<#>)
+    , avgRepeatedFree
+    , exactDims
+    , eyeFree
+    , fromL
+    , innerDims
+    , toL
     )
 where
 
@@ -107,12 +109,12 @@ removeAvg :: (KnownNat n) => LinearMap n n
 removeAvg = eyeFree +# ((-1) *# avgRepeatedFree)
 
 
-exactDims'
+exactDims
     :: forall n m j k
      . (KnownNat n, KnownNat m, KnownNat j, KnownNat k)
     => LinearMap m n
     -> Maybe (LinearMap j k)
-exactDims' m@(LinearMap f b) = do
+exactDims m@(LinearMap f b) = do
     Refl <- sameNat (Proxy :: Proxy m) (Proxy :: Proxy j)
     Refl <- sameNat (Proxy :: Proxy n) (Proxy :: Proxy k)
     return $ LinearMap f b
