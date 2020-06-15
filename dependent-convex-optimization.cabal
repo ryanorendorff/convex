@@ -5,6 +5,7 @@ version:             0.1.0.0
 synopsis:            Dependently typed convex optimization
 
 homepage:            https://github.com/ryanorendorff/convex
+license:             BSD-3-Clause
 license-file:        LICENSE
 author:              Ryan Orendorff
 maintainer:          ryan@orendorff.io
