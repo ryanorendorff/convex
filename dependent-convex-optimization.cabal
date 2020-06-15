@@ -1,15 +1,14 @@
 cabal-version:       2.2
 
-name:                dependently-typed-convex-optimization
+name:                convex
 version:             0.1.0.0
-synopsis:            Dependently typed convex optimization for LambdaConf 2019
+synopsis:            Dependently typed convex optimization
 
-homepage:            https://github.com/ryanorendorff/lc-2019-dependently-typed-convex-optimization
-license:             GPL-3.0-only
+homepage:            https://github.com/ryanorendorff/convex
 license-file:        LICENSE
 author:              Ryan Orendorff
 maintainer:          ryan@orendorff.io
-copyright:           2019 Ryan Orendorff
+copyright:           2020 Ryan Orendorff
                      
 category:            Math
 
@@ -55,7 +54,7 @@ library
     -Wno-orphans
 
 
-executable dependently-typed-convex-optimization
+executable convex-example
   -- .hs or .lhs file containing the Main module.
   main-is:             Main.hs
 
@@ -74,7 +73,7 @@ executable dependently-typed-convex-optimization
     , hmatrix-glpk
     , vector
     , random
-    , dependently-typed-convex-optimization
+    , convex
     , base >=4.10.1.0
 
   -- Directories containing source files.
