@@ -18,8 +18,10 @@ extra-source-files:  README.md
 library
   -- Modules exported by the library.
   exposed-modules:
+    Numeric.UnitaryRational
     Numeric.LinearAlgebra.MatrixFree
     Numeric.LinearProgramming.L1.Static
+    Numeric.LinearProgramming.LP.Static
     ControlSystems.DynamicSystems.Conversions
     ControlSystems.DynamicSystems.Conversions.Static
 
@@ -38,6 +40,7 @@ library
     , hmatrix-glpk
     , vector
     , random
+    , utility-ht
     , base >=4.10.1.0
                 
 
