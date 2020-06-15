@@ -7,7 +7,7 @@ let
 
   pkgs = import (jupyter-src.outPath + "/nix") {};
 
-  dependent-convex = import ../default.nix {inherit pkgs; installOnly = false;};
+  convex = import ../default.nix {inherit pkgs; installOnly = false;};
 
   haskellPackages = pkgs.haskellPackages.override (old: {
     overrides = pkgs.lib.composeExtensions old.overrides
@@ -29,7 +29,7 @@ let
   iHaskell = jupyter.kernels.iHaskellWith {
     name = "haskell";
     haskellPackages = haskellPackages;
-    packages = p: with p; [ hvega formatting hmatrix hmatrix-glpk vector random ghc-typelits-natnormalise ghc-typelits-knownnat gnuplot ihaskell-charts Chart cairo dependent-convex ];
+    packages = p: with p; [ hvega formatting hmatrix hmatrix-glpk vector random ghc-typelits-natnormalise ghc-typelits-knownnat gnuplot ihaskell-charts Chart cairo convex ];
   };
 
   jupyterEnvironment =
