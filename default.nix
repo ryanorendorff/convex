@@ -4,7 +4,7 @@ let
 
   inherit (pkgs) lib;
 
-  name = "dependent-convex-optimization";
+  name = "convex";
 
   regexes = [ ".*.cabal$" "^src.*" "^main.*" "^Setup.hs$" "LICENSE" ];
 
@@ -16,11 +16,11 @@ let
       in lib.any (re: builtins.match re relPath != null) regexes;
   };
 
-  dependent-convex = pkgs.haskellPackages.callCabal2nix name src { };
+  convex = pkgs.haskellPackages.callCabal2nix name src { };
 
 in
 
   if installOnly then
-    pkgs.haskell.lib.justStaticExecutables dependent-convex
+    pkgs.haskell.lib.justStaticExecutables convex
   else
-    dependent-convex
+    convex
