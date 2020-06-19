@@ -1,10 +1,8 @@
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE TypeOperators #-}
-{-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE ViewPatterns #-}
-{-# LANGUAGE KindSignatures #-}
 {-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE RankNTypes #-}
 
@@ -24,7 +22,6 @@ import qualified Numeric.LinearProgramming.L1  as L1
 import           Data.Maybe
 import           System.Random
 import qualified Data.Vector.Storable          as V
-import           Data.Proxy
 import           Data.Tuple.HT                  ( fst3 )
 
 
@@ -70,22 +67,22 @@ foldR1 f x = V.foldl1' f (extract x)
 -- TODO: Implement solution for extracting k largest eigenvalues directly.
 
 -- Note that these are not particularly efficient as each eigenvalue must be extracted and then searched through to find the maximum.
-lsq_lipschitz :: (KnownNat m, KnownNat n) => L m n -> Double
-lsq_lipschitz a = foldR1 max . eigenvalues $ mTm a
+lsqLipschitz :: (KnownNat m, KnownNat n) => L m n -> Double
+lsqLipschitz a = foldR1 max . eigenvalues $ mTm a
 
-quadratic_lipschitz :: (KnownNat n) => Sym n -> Double
-quadratic_lipschitz = foldR1 max . eigenvalues
+quadraticLipschitz :: (KnownNat n) => Sym n -> Double
+quadraticLipschitz = foldR1 max . eigenvalues
 
 
 ---------------------------------------------------------
 --                  Proximal Functions                 --
 ---------------------------------------------------------
-indicator_box :: Double -> Double -> (forall n . KnownNat n => R n -> Double)
-indicator_box l u =
+indicatorBox :: Double -> Double -> (forall n . KnownNat n => R n -> Double)
+indicatorBox l u =
     foldR (\a b -> a + (if (b > u) || (b < l) then 1 / 0 else 0)) 0
 
-prox_indicator_box :: Double -> Double -> (forall n . KnownNat n => R n -> R n)
-prox_indicator_box l u = dvmap bound
+proxIndicatorBox :: Double -> Double -> (forall n . KnownNat n => R n -> R n)
+proxIndicatorBox l u = dvmap bound
   where
     bound x = case (x < l, x > u) of
         (True, _   ) -> l
@@ -105,12 +102,12 @@ fista
     -> Double          -- ^ Lipschitz constant
     -> Maybe (R n)     -- ^ Initial guess at a solution
     -> [R n]           -- ^ Output cost function and optimal solution over time
-fista grad_f prox_g lipschitz (maybe (konst 0) id -> x0) = map fst3
+fista grad_f prox_g lipschitz (fromMaybe (konst 0) -> x0) = map fst3
     $ iterate go (x0, x0, 1)
   where
         -- Sometimes update is called p_L
-    gradient_step = \x -> x - (konst (1 / lipschitz)) * grad_f x
-    prox_step     = \x -> prox_g x
+    gradient_step = \x -> x - konst (1 / lipschitz) * grad_f x
+    prox_step     = prox_g
     update        = prox_step . gradient_step
 
     -- Algorithm here
@@ -119,7 +116,7 @@ fista grad_f prox_g lipschitz (maybe (konst 0) id -> x0) = map fst3
             x_update = update y
             t_update = (1 + sqrt (1 + 4 * t ^^ 2)) / 2
             y_update =
-                x_update + (konst $ (t - 1) / (t_update)) * (x_update - x)
+                x_update + konst ((t - 1) / t_update) * (x_update - x)
         in
             (x_update, y_update, t_update)
 
@@ -131,12 +128,12 @@ residuals x = zipWith (\x xn -> norm_2 (x - xn)) x (tail x)
 -----------------------------------------------------------------
 
 -- | Takes the most smooth convex function `f` and the convex (potentially non-smooth) function `g` and calculates the cost of a given input.
-fista_cost :: KnownNat n => (R n -> Double) -> (R n -> Double) -> R n -> Double
-fista_cost f g x = f x + g x
+fistaCost :: KnownNat n => (R n -> Double) -> (R n -> Double) -> R n -> Double
+fistaCost f g x = f x + g x
 
 
-l1_cost :: (KnownNat n) => Double -> R n -> Double
-l1_cost lambda = (lambda *) . norm_1
+l1Cost :: (KnownNat n) => Double -> R n -> Double
+l1Cost lambda = (lambda *) . norm_1
 
-l1_prox :: (KnownNat n) => Double -> R n -> R n
-l1_prox lambda = dvmap f where f xi = signum xi * max (abs xi - lambda) 0
+l1Prox :: (KnownNat n) => Double -> R n -> R n
+l1Prox lambda = dvmap f where f xi = signum xi * max (abs xi - lambda) 0
