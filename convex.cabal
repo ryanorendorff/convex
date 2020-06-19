@@ -22,6 +22,7 @@ library
     Numeric.LinearAlgebra.MatrixFree
     Numeric.LinearProgramming.L1.Static
     Numeric.LinearProgramming.LP.Static
+    Numeric.Proximal.Static
     ControlSystems.DynamicSystems.Conversions
     ControlSystems.DynamicSystems.Conversions.Static
 
