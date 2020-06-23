@@ -6,14 +6,12 @@ where
 
 import Numeric.LinearAlgebra
 
-type ℝ = Double
-
 -- | Convert a continuous time linear differential system to a discrete form,
 -- using state space models.
-c2d :: Double   -- ^ The sampling time
-    -> Matrix ℝ -- ^ The state transition matrix, often called A
-    -> Matrix ℝ -- ^ The state input matrix, often called B
-    -> (Matrix ℝ, Matrix ℝ) -- ^ The discretized linear differential system.
+c2d :: Double                         -- ^ The sampling time
+    -> Matrix Double                  -- ^ The state transition matrix, aka A
+    -> Matrix Double                  -- ^ The state input matrix, aka B
+    -> (Matrix Double, Matrix Double) -- ^ The discretized A & B system
 c2d t a b = (a_d, b_d)
   where
     -- First we have to extract the sizes of all the matrices at run time.
