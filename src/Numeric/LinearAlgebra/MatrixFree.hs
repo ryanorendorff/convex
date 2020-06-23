@@ -121,9 +121,9 @@ infixr 7 +#
 
 
 exactDimsFree
-    :: forall n m j k
-     . (KnownNat n, KnownNat m, KnownNat j, KnownNat k)
-    => LinearMap m n
+    :: forall m n j k.
+       (KnownNat n, KnownNat m, KnownNat j, KnownNat k) =>
+       LinearMap m n
     -> Maybe (LinearMap j k)
 exactDimsFree m@(LinearMap f b) = do
     Refl <- sameNat (Proxy :: Proxy m) (Proxy :: Proxy j)
@@ -131,9 +131,9 @@ exactDimsFree m@(LinearMap f b) = do
     return $ LinearMap f b
 
 innerDimsFree
-    :: forall n m p q
-     . (KnownNat m, KnownNat n, KnownNat p, KnownNat q)
-    => LinearMap m n
+    :: forall m n p q.
+       (KnownNat m, KnownNat n, KnownNat p, KnownNat q) =>
+       LinearMap m n
     -> LinearMap p q
     -> Maybe (LinearMap m n, LinearMap p q, n :~: p)
 innerDimsFree a@(LinearMap fa ba) b@(LinearMap fb bb) = do
