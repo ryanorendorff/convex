@@ -33,34 +33,48 @@ import           Numeric.LinearAlgebra.Static
 import qualified Data.Vector.Storable          as V
 
 
+-- | A linear operator/map between two vector spaces
 data LinearMap (m :: Nat) (n :: Nat) where
-  -- | Construct a LinearMap from a forward and adjoint function
   LinearMap ::(KnownNat m, KnownNat n) =>
-                    (R n -> R m) -- Forward Function
-                 -> (R m -> R n) -- Adjoint Function
+                    (R n -> R m) -- ^ Forward Function
+                 -> (R m -> R n) -- ^ Adjoint Function
                  -> LinearMap m n
 
-fromL :: (KnownNat m, KnownNat n) => L m n -> LinearMap m n
+-- | Convert a static matrix into the matrix free data type. This merely
+-- wraps the matrix in a function (eta abstraction); it does not determine
+-- the function associated with a given matrix.
+fromL :: (KnownNat m, KnownNat n) =>
+         L m n -- ^ Static matrix to convert to matrix free data type
+      -> LinearMap m n
 fromL a = LinearMap (a #>) (tr a #>)
 
--- This is likely a terrible solution because of the conversion to list. We
--- should be able to coerce the result safely!
+-- | Convert a matrix free linear map into a static matrix.
+--
+-- This methods is very inefficient as it traverses several components
+-- linearly several times.
 toL :: (KnownNat m, KnownNat n) => LinearMap m n -> L m n
 toL (LinearMap f _) =
     matrix $ concatMap (V.toList . extract . f) (toColumns eye)
 
 
+-- | The identity matrix in matrix free form.
 eyeFree :: (KnownNat n) => LinearMap n n
 eyeFree = LinearMap id id
 
 
-avg :: forall n . (KnownNat n) => R n -> Double
+-- | Take the average of a vector.
+avg :: forall n. (KnownNat n) => R n -> Double
 avg v = v <.> 1 / n' where n' = fromIntegral . natVal $ (Proxy :: Proxy n)
 
 
+-- | mean(v) * 1, where 1 is the ones vector. of length v.
 avgRepeatedFree :: (KnownNat n) => LinearMap n n
 avgRepeatedFree = LinearMap f f where f v = konst (avg v)
 
+
+-- | Remove the average value of a vector from each element of the vector.
+removeAvg :: (KnownNat n) => LinearMap n n
+removeAvg = eyeFree +# ((-1) *# avgRepeatedFree)
 
 -- TODO: Define fft in matrix free form using FFT and IFFT
 
@@ -104,9 +118,6 @@ infixr 8 *#
     LinearMap (\v -> f_b v + f_a v) (\v -> a_b v + a_a v)
 
 infixr 7 +#
-
-removeAvg :: (KnownNat n) => LinearMap n n
-removeAvg = eyeFree +# ((-1) *# avgRepeatedFree)
 
 
 exactDimsFree
