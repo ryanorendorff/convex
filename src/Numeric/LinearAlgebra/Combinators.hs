@@ -1,12 +1,4 @@
-{-# LANGUAGE GADTs                  #-}
-{-# LANGUAGE DataKinds              #-}
-{-# LANGUAGE KindSignatures         #-}
-
-{-# LANGUAGE ScopedTypeVariables    #-}
 {-# LANGUAGE TypeOperators          #-}
-{-# LANGUAGE ViewPatterns           #-}
-{-# LANGUAGE MultiParamTypeClasses  #-}
-{-# LANGUAGE FlexibleContexts       #-}
 
 {-# OPTIONS_GHC -fplugin GHC.TypeLits.KnownNat.Solver #-}
 {-# OPTIONS_GHC -fplugin GHC.TypeLits.Normalise #-}
@@ -16,15 +8,16 @@ module Numeric.LinearAlgebra.Combinators
     )
 where
 
+import           GHC.TypeLits
 import           Numeric.LinearAlgebra.Static
 
 
+-- | Generate a block matrix from static matrices.
 blockMatrix
-    :: forall m n p q
-     . (KnownNat m, KnownNat n, KnownNat p, KnownNat q)
-    => L m n
-    -> L m p
-    -> L q n
-    -> L q p
-    -> L (m + q) (n + p)
+    :: (KnownNat m, KnownNat n, KnownNat p, KnownNat q)
+    => L m n -- ^ Upper left matrix
+    -> L m p -- ^ Upper right matrix
+    -> L q n -- ^ Lower left matrix
+    -> L q p -- ^ Lower right matrix
+    -> L (m + q) (n + p) -- ^ Resulting block matrix
 blockMatrix a b c d = a ||| b === c ||| d
