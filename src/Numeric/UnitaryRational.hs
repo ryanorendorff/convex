@@ -17,7 +17,7 @@ where
 import           GHC.TypeLits
 import           Data.Proxy
 
--- A type level rational that is between zero and one. This is not a quotient
+-- | A type level rational that is between zero and one. This is not a quotient
 -- type; two values that are the same under reduction (ex: 1/2 and 2/4) are not
 -- the same here. This could be done with a smart constructor; to guarantee
 -- this property at the type level we would need something like quotient types.
@@ -32,21 +32,23 @@ instance (KnownNat n, KnownNat m) => Show (UnitaryRational n m) where
         m' = fromIntegral . natVal $ (undefined :: Proxy m) :: Int
 
 
+-- | Converts a UnitaryRational to a numerator and denominator.
 unitaryToPair
     :: forall n m
      . (KnownNat n, KnownNat m)
-    => UnitaryRational n m
-    -> (Integer, Integer)
+    => UnitaryRational n m -- ^ The UnitaryRational to convert
+    -> (Integer, Integer)  -- ^ Pair of (numerator, denominator)
 unitaryToPair _ = (num, denom)
   where
     num   = natVal $ (undefined :: Proxy n) :: Integer
     denom = natVal $ (undefined :: Proxy m) :: Integer
 
 
+-- | Convert a UnitaryRational to a floating point number.
 unitaryToFractional
     :: forall n m o
      . (KnownNat n, KnownNat m, Fractional o)
-    => UnitaryRational n m
-    -> o
+    => UnitaryRational n m  -- ^ The UnitaryRational to convert
+    -> o                    -- ^ The Fractional representation of the input
 unitaryToFractional x = (fromIntegral num) / (fromIntegral denom)
     where (num, denom) = unitaryToPair x
