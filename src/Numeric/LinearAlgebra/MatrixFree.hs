@@ -138,11 +138,10 @@ infixr 7 +#
 
 -- | Useful for constraining two dependently typed LinearMap matrices to
 -- match each other in dimensions when they are unknown at compile-time.
-exactDimsFree
-    :: forall m n j k.
-       (KnownNat n, KnownNat m, KnownNat j, KnownNat k) =>
-       LinearMap m n
-    -> Maybe (LinearMap j k)
+exactDimsFree :: forall m n j k.
+                 (KnownNat n, KnownNat m, KnownNat j, KnownNat k) =>
+                 LinearMap m n
+              -> Maybe (LinearMap j k)
 exactDimsFree (LinearMap f b) = do
     Refl <- sameNat (Proxy :: Proxy m) (Proxy :: Proxy j)
     Refl <- sameNat (Proxy :: Proxy n) (Proxy :: Proxy k)
