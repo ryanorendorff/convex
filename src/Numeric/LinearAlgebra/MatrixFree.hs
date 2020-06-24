@@ -36,10 +36,17 @@ import qualified Data.Vector.Storable          as V
 
 -- | A linear operator/map between two vector spaces
 data LinearMap (m :: Nat) (n :: Nat) where
-  LinearMap ::(KnownNat m, KnownNat n) =>
-                    (R n -> R m) -- ^ Forward Function
-                 -> (R m -> R n) -- ^ Adjoint Function
-                 -> LinearMap m n
+  LinearMap :: (KnownNat m, KnownNat n) =>
+               (R n -> R m) -- ^ Forward Function
+            -> (R m -> R n) -- ^ Adjoint Function
+            -> LinearMap m n
+
+instance Transposable (LinearMap n m) (LinearMap m n) where
+   -- We do not have different functions for conjugate transposes in the
+   -- LinearMap constructor (yet?)
+    tr  (LinearMap f a) = LinearMap a f
+    tr' = tr
+
 
 -- | Convert a static matrix into the matrix free data type. This merely
 -- wraps the matrix in a function (eta abstraction); it does not determine
@@ -78,12 +85,6 @@ removeAvg :: (KnownNat n) => LinearMap n n
 removeAvg = eyeFree +# ((-1) *# avgRepeatedFree)
 
 -- TODO: Define fft in matrix free form using FFT and IFFT
-
-instance Transposable (LinearMap n m) (LinearMap m n) where
-   -- We do not have different functions for conjugate transposes in the
-   -- LinearMap constructor (yet?)
-    tr  (LinearMap f a) = LinearMap a f
-    tr' = tr
 
 
 -- | Apply matrix free LinearMap to a vector
