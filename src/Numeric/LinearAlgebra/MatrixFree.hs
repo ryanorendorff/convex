@@ -150,12 +150,10 @@ exactDimsFree (LinearMap f b) = do
 -- | Useful for constraining that two dependently typed LinearMap matrices
 -- match in their inner dimensions (enabling matrix multiplication) each
 -- other in dimensions when they are unknown at compile-time.
-innerDimsFree
-    :: forall m n p q.
-       (KnownNat m, KnownNat n, KnownNat p, KnownNat q) =>
-       LinearMap m n
-    -> LinearMap p q
-    -> Maybe (LinearMap m n, LinearMap p q, n :~: p)
-innerDimsFree (LinearMap fa ba) (LinearMap fb bb) = do
+innerDimsFree :: forall m n p q. (KnownNat n, KnownNat p) =>
+                 LinearMap m n   -- ^ The left LinearMap in a matrix multiply
+              -> LinearMap p q   -- ^ The right LinearMap in a matrix multiply
+              -> Maybe (n :~: p) -- ^ Proof that the inner dimensions are equal
+innerDimsFree (LinearMap _ _) (LinearMap _ _) = do
     Refl <- sameNat (Proxy :: Proxy n) (Proxy :: Proxy p)
-    return (LinearMap fa ba, LinearMap fb bb, Refl)
+    return (Refl)
