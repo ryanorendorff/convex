@@ -20,6 +20,7 @@ library
   exposed-modules:
     Numeric.UnitaryRational
     Numeric.LinearAlgebra.MatrixFree
+    Numeric.LinearAlgebra.Combinators
     Numeric.LinearProgramming.L1.Static
     Numeric.LinearProgramming.LP.Static
     Numeric.Proximal.Static
@@ -52,6 +53,7 @@ library
   default-language:    Haskell2010
   ghc-options:
     -Wall
+    -Werror
     -Wcompat
     -Wincomplete-record-updates
     -Wincomplete-uni-patterns
