@@ -79,6 +79,7 @@ _minted*
 result
 
 # direnv. Ignored so that the user can choose what to use instead.
+.direnv/
 .envrc
 
 # Mac
