@@ -48,6 +48,10 @@ instance Transposable (LinearMap n m) (LinearMap m n) where
     tr' = tr
 
 
+---------------------------------------------------------------------
+--        Conversions between matrices and matrix free forms       --
+---------------------------------------------------------------------
+
 -- | Convert a static matrix into the matrix free data type. This merely
 -- wraps the matrix in a function (eta abstraction); it does not determine
 -- the function associated with a given matrix.
@@ -64,6 +68,10 @@ toL :: (KnownNat m, KnownNat n) => LinearMap m n -> L m n
 toL (LinearMap f _) =
     matrix $ concatMap (V.toList . extract . f) (toColumns eye)
 
+
+---------------------------------------------------------------------------
+--                           Example LinearMaps                          --
+---------------------------------------------------------------------------
 
 -- | The identity matrix in matrix free form.
 eyeFree :: (KnownNat n) => LinearMap n n
@@ -86,6 +94,9 @@ removeAvg = eyeFree +# ((-1) *# avgRepeatedFree)
 
 -- TODO: Define fft in matrix free form using FFT and IFFT
 
+---------------------------------------------------------------------
+--                Operators for composing LinearMaps               --
+---------------------------------------------------------------------
 
 -- | Apply matrix free LinearMap to a vector
 (##>) :: LinearMap n m -> R m -> R n
@@ -120,6 +131,10 @@ infixr 8 *#
 
 infixr 7 +#
 
+
+-----------------------------------------------------------------------------
+--                    Runtime Proofs on LinearMap shape                    --
+-----------------------------------------------------------------------------
 
 -- | Useful for constraining two dependently typed LinearMap matrices to
 -- match each other in dimensions when they are unknown at compile-time.
