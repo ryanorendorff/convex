@@ -19,6 +19,7 @@ module Numeric.LinearAlgebra.MatrixFree
     , avgRepeatedFree
     , exactDimsFree
     , eyeFree
+    , removeAvg
     , fromL
     , innerDimsFree
     , toL
@@ -28,7 +29,7 @@ where
 import           Data.Proxy                     ( Proxy(..) )
 import           Data.Type.Equality             ( (:~:)(Refl) )
 import           GHC.TypeLits
-import           Numeric.LinearAlgebra          ( Transposable )
+import           Numeric.LinearAlgebra          ( Transposable(..) )
 import           Numeric.LinearAlgebra.Static
 import qualified Data.Vector.Storable          as V
 
@@ -78,24 +79,23 @@ removeAvg = eyeFree +# ((-1) *# avgRepeatedFree)
 
 -- TODO: Define fft in matrix free form using FFT and IFFT
 
-trLM :: (KnownNat n, KnownNat m) => LinearMap n m -> LinearMap m n
+trLM :: LinearMap n m -> LinearMap m n
 trLM (LinearMap f a) = LinearMap a f
 
-instance  (KnownNat n, KnownNat m) =>
-          Transposable (LinearMap n m) (LinearMap m n) where
-    tr = trLM
+instance Transposable (LinearMap n m) (LinearMap m n) where
+    tr  = trLM
+    tr' = tr
 
 
 -- Apply matrix free function to a vector
-(##>) :: (KnownNat n, KnownNat m) => LinearMap n m -> R m -> R n
-(##>) (LinearMap f a) = f
+(##>) :: LinearMap n m -> R m -> R n
+(##>) (LinearMap f _) = f
 
 
 infixr 8 ##>
 
 (<#>)
-    :: (KnownNat m, KnownNat n, KnownNat p)
-    => LinearMap m n
+    :: LinearMap m n
     -> LinearMap n p
     -> LinearMap m p
 (<#>) (LinearMap f_a a_a) (LinearMap f_b a_b) =
@@ -125,7 +125,7 @@ exactDimsFree
        (KnownNat n, KnownNat m, KnownNat j, KnownNat k) =>
        LinearMap m n
     -> Maybe (LinearMap j k)
-exactDimsFree m@(LinearMap f b) = do
+exactDimsFree (LinearMap f b) = do
     Refl <- sameNat (Proxy :: Proxy m) (Proxy :: Proxy j)
     Refl <- sameNat (Proxy :: Proxy n) (Proxy :: Proxy k)
     return $ LinearMap f b
@@ -136,6 +136,6 @@ innerDimsFree
        LinearMap m n
     -> LinearMap p q
     -> Maybe (LinearMap m n, LinearMap p q, n :~: p)
-innerDimsFree a@(LinearMap fa ba) b@(LinearMap fb bb) = do
+innerDimsFree (LinearMap fa ba) (LinearMap fb bb) = do
     Refl <- sameNat (Proxy :: Proxy n) (Proxy :: Proxy p)
     return (LinearMap fa ba, LinearMap fb bb, Refl)
