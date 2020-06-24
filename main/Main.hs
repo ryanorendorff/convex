@@ -29,11 +29,9 @@ import           GHC.TypeLits
 import           Numeric.LinearAlgebra.Static
 import qualified Numeric.LinearAlgebra as LA
 import           Data.Proxy
-import           Numeric.LinearAlgebra.MatrixFree
 import qualified Numeric.LinearProgramming.L1 as L1
 import qualified Numeric.LinearProgramming.L1.Static as L1S
 import Data.Maybe (fromJust)
-import ControlSystems.DynamicSystems.Conversions.Static
 import System.Random
 import qualified Data.Vector.Storable as V
 
@@ -70,7 +68,12 @@ l1_example = (signal_static, x, x_static, lsq_sol)
 
     lsq_sol = a LA.<\> b
 
-(signal, x, x_static, lsq_sol) = l1_example
+
+originalSignal :: R 1000
+l1Sol :: LA.Vector ℝ
+l1SolStatic :: R 1000
+lsqComparisonSol :: V.Vector ℝ
+(originalSignal, l1Sol, l1SolStatic, lsqComparisonSol) = l1_example
 
 main :: IO ()
 main = do
