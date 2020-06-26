@@ -25,8 +25,8 @@ import qualified Numeric.LinearAlgebra.Static as S
 import qualified Numeric.LinearAlgebra as LA
 import Numeric.UnitaryRational
 
--- https://en.wikipedia.org/wiki/Karmarkar%27s_algorithm
-affineScaling :: (KnownNat m, KnownNat n, KnownNat p, KnownNat q, 1 <= n, 1 <= m) => L m n -> R m -> R n -> R n -> UnitaryRational p q -> [Maybe (R n)]
+-- | https://en.wikipedia.org/wiki/Karmarkar%27s_algorithm
+affineScaling :: (KnownNat m, KnownNat n, KnownNat p, KnownNat q) => L m n -> R m -> R n -> R n -> UnitaryRational p q -> [Maybe (R n)]
 affineScaling a b c x0 gamma = iterate (>>= go) (Just x0)
     where
         gamma' = unitaryToFractional gamma
@@ -52,6 +52,7 @@ affineScaling a b c x0 gamma = iterate (>>= go) (Just x0)
 -- Example
 -- -------
 --
+-- 
 -- p = vector [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0] :: R 11
 -- 
 -- -- min c^Tx
