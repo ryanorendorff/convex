@@ -10,7 +10,20 @@
 {-# OPTIONS_GHC -fplugin GHC.TypeLits.Normalise #-}
 
 module Numeric.Proximal.Static
-    ( fista
+    ( Coord(..)
+    , atM
+    , atV
+    , fista
+    , fistaCost
+    , foldR
+    , foldR1
+    , indicatorBox
+    , l1Cost
+    , l1Prox
+    , lsqLipschitz
+    , proxIndicatorBox
+    , quadraticLipschitz
+    , residuals
     )
 where
 
@@ -18,9 +31,7 @@ import           GHC.TypeLits
 import           Numeric.LinearAlgebra.Static
 import qualified Numeric.LinearAlgebra         as LA
 import           Data.Proxy
-import qualified Numeric.LinearProgramming.L1  as L1
 import           Data.Maybe
-import           System.Random
 import qualified Data.Vector.Storable          as V
 import           Data.Tuple.HT                  ( fst3 )
 
@@ -30,32 +41,40 @@ import           Data.Tuple.HT                  ( fst3 )
 ------------------------------------------------------------------------
 
 -- TODO: move this to another module
+-- | Type level natural meant as an index into a vector or matrix
 data Coord (n :: Nat) = Coord
 
+-- | Get a value from a vector at a given coordinate/index with guarantee
+-- that the element index is within the length of the vector at compile
+-- time.
 atV
     :: forall n k
-     . (KnownNat n, KnownNat k, k+1<=n)
+     . (KnownNat n, KnownNat k)
     => R n
     -> Coord k
     -> Double
 atV v _ = extract v LA.! pos
     where pos = fromIntegral . natVal $ (undefined :: Proxy k)
 
+-- | Get element from matrix at a given coordinate/index with guarantee that
+-- the element index is within the shape of the matrix at compile time.
 atM
     :: forall m n i j
-     . (KnownNat m, KnownNat n, KnownNat i, KnownNat j, i+1<=m, j+1 <=n)
+     . (KnownNat m, KnownNat n, KnownNat i, KnownNat j)
     => L m n
     -> Coord i
     -> Coord j
     -> Double
-atM m _ _ = extract m `LA.atIndex` (pi, pj)
+atM m _ _ = extract m `LA.atIndex` (i, j)
   where
-    pi = fromIntegral . natVal $ (undefined :: Proxy i)
-    pj = fromIntegral . natVal $ (undefined :: Proxy j)
+    i = fromIntegral . natVal $ (undefined :: Proxy i)
+    j = fromIntegral . natVal $ (undefined :: Proxy j)
 
+-- | Fold a vector.
 foldR :: KnownNat n => (b -> Double -> b) -> b -> R n -> b
 foldR f initial x = V.foldl' f initial (extract x)
 
+-- | Fold a vector without an initial element.
 foldR1 :: KnownNat n => (Double -> Double -> Double) -> R n -> Double
 foldR1 f x = V.foldl1' f (extract x)
 
@@ -77,10 +96,15 @@ quadraticLipschitz = foldR1 max . eigenvalues
 ---------------------------------------------------------
 --                  Proximal Functions                 --
 ---------------------------------------------------------
+
+-- | Returns the cost function for the box indicator function.
+-- I(l, u) = {0 if l < xᵢ < u ∀ xᵢ ∈ x
+--            ∞ otherwise}
 indicatorBox :: Double -> Double -> (forall n . KnownNat n => R n -> Double)
 indicatorBox l u =
     foldR (\a b -> a + (if (b > u) || (b < l) then 1 / 0 else 0)) 0
 
+-- | Proximal operator for the box indicator function
 proxIndicatorBox :: Double -> Double -> (forall n . KnownNat n => R n -> R n)
 proxIndicatorBox l u = dvmap bound
   where
@@ -114,26 +138,30 @@ fista grad_f prox_g lipschitz (fromMaybe (konst 0) -> x0) = map fst3
     go (x, y, t) =
         let
             x_update = update y
-            t_update = (1 + sqrt (1 + 4 * t ^^ 2)) / 2
+            t_update = (1 + sqrt (1 + 4 * t ^^ (2 :: Int))) / 2
             y_update =
                 x_update + konst ((t - 1) / t_update) * (x_update - x)
         in
             (x_update, y_update, t_update)
 
+-- | Residuals for a list of vectors.
 residuals :: forall n . KnownNat n => [R n] -> [Double]
-residuals x = zipWith (\x xn -> norm_2 (x - xn)) x (tail x)
+residuals x = zipWith (\y yn -> norm_2 (y - yn)) x (tail x)
 
 -----------------------------------------------------------------
 --                        Cost Functions                       --
 -----------------------------------------------------------------
 
--- | Takes the most smooth convex function `f` and the convex (potentially non-smooth) function `g` and calculates the cost of a given input.
-fistaCost :: KnownNat n => (R n -> Double) -> (R n -> Double) -> R n -> Double
+-- | Takes the most smooth convex function `f` and the convex (potentially
+-- non-smooth) function `g` and calculates the cost of a given input.
+fistaCost :: (R n -> Double) -> (R n -> Double) -> R n -> Double
 fistaCost f g x = f x + g x
 
 
+-- | Cost function for an ℓ₁ term
 l1Cost :: (KnownNat n) => Double -> R n -> Double
 l1Cost lambda = (lambda *) . norm_1
 
+-- | Proximal equation a the ℓ₁ term
 l1Prox :: (KnownNat n) => Double -> R n -> R n
 l1Prox lambda = dvmap f where f xi = signum xi * max (abs xi - lambda) 0
