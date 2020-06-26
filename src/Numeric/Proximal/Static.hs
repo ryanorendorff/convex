@@ -40,7 +40,17 @@ import           Data.Tuple.HT                  ( fst3 )
 --   Get data from vector/matrix at known location (Fin simulation)  --
 ------------------------------------------------------------------------
 
--- TODO: move this to another module
+-- TODO: move element selection to another module
+
+-- TODO:
+-- Currently GHC thinks that the k + 1 <= n (and similar constraints) are
+-- redundant because there is no constraint that specifies that Coord must
+-- be within the length of the vector. Put another way, the constraint is
+-- specified but used on the value level instead of the type level, so GHC
+-- doesn't understand why the constraint exists. Ideally Coord can be
+-- replaced with something line Fin but that does not use peano numbers to
+-- encode this property.
+
 -- | Type level natural meant as an index into a vector or matrix
 data Coord (n :: Nat) = Coord
 
@@ -49,7 +59,7 @@ data Coord (n :: Nat) = Coord
 -- time.
 atV
     :: forall n k
-     . (KnownNat n, KnownNat k)
+     . (KnownNat n, KnownNat k, k + 1 <= n)
     => R n
     -> Coord k
     -> Double
@@ -60,7 +70,7 @@ atV v _ = extract v LA.! pos
 -- the element index is within the shape of the matrix at compile time.
 atM
     :: forall m n i j
-     . (KnownNat m, KnownNat n, KnownNat i, KnownNat j)
+     . (KnownNat m, KnownNat n, KnownNat i, KnownNat j, i + 1 <= m, j + 1 <= n)
     => L m n
     -> Coord i
     -> Coord j
