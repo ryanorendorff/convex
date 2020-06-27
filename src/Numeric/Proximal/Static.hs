@@ -43,26 +43,22 @@ import           Data.Tuple.HT                  ( fst3 )
 
 -- TODO: move element selection to another module
 
--- TODO:
--- Currently GHC thinks that the k + 1 <= n (and similar constraints) are
--- redundant because there is no constraint that specifies that Coord must
--- be within the length of the vector. Put another way, the constraint is
--- specified but used on the value level instead of the type level, so GHC
--- doesn't understand why the constraint exists. Ideally Coord can be
--- replaced with something line Fin but that does not use peano numbers to
--- encode this property.
-
 -- | Set of natural numbers < n ([0, ..., n - 1]). These are constructed
 -- using typelits, which has some convenient machinery and does not require
 -- the very inefficient Peano encoding.
+--
+-- One gotcha to this encoding is that the error messages are cryptic; the
+-- errors only mention that the type level 'False does not equal the type
+-- level 'True, instead of saying that the size constraint (k + 1 <= n) is
+-- being violated.
 data Fin (n :: Nat) where
   Fin :: (KnownNat k, k + 1 <= n) => Proxy k -> Fin n
 
 instance (KnownNat n) => Show (Fin n) where
   show f = show (fromFin f)
 
-fromFin :: (KnownNat n) => Fin n -> Integer
-fromFin p = natVal p
+fromFin :: Fin n -> Integer
+fromFin (Fin p) = natVal p
 
 -- | Get a value from a vector at a given coordinate/index with guarantee
 -- that the element index is within the length of the vector at compile
@@ -79,16 +75,16 @@ atV v c = extract v LA.! pos
 -- | Get element from matrix at a given coordinate/index with guarantee that
 -- the element index is within the shape of the matrix at compile time.
 atM
-    :: forall m n i j
-     . (KnownNat m, KnownNat n, KnownNat i, KnownNat j, i + 1 <= m, j + 1 <= n)
+    :: forall m n
+     . (KnownNat m, KnownNat n)
     => L m n
-    -> Fin i
-    -> Fin j
+    -> Fin m
+    -> Fin n
     -> Double
-atM m _ _ = extract m `LA.atIndex` (i, j)
+atM mat m n = extract mat `LA.atIndex` (i, j)
   where
-    i = fromIntegral . natVal $ (undefined :: Proxy i)
-    j = fromIntegral . natVal $ (undefined :: Proxy j)
+    i = fromIntegral . fromFin $ m
+    j = fromIntegral . fromFin $ n
 
 -- | Fold a vector.
 foldR :: KnownNat n => (b -> Double -> b) -> b -> R n -> b
