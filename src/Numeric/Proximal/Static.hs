@@ -57,6 +57,17 @@ data Fin (n :: Nat) where
 instance (KnownNat n) => Show (Fin n) where
   show f = show (fromFin f :: Integer)
 
+instance (KnownNat n) => Eq (Fin n) where
+  (==) a b = (fromFin a :: Integer) == fromFin b
+
+instance (KnownNat n) => Ord (Fin n) where
+  compare a b = (fromFin a :: Integer) `compare` fromFin b
+
+-- Fin 0 has no inhabitants! It is the same as Void
+instance (KnownNat n, 1 <= n) => Bounded (Fin n) where
+  minBound = Fin (Proxy :: Proxy 0)
+  maxBound = Fin (Proxy :: Proxy (n - 1))
+
 fromFin :: (Integral i) => Fin n -> i
 fromFin (Fin p) = fromIntegral $ natVal p
 
