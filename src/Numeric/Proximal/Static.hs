@@ -1,16 +1,17 @@
 {-# LANGUAGE DataKinds #-}
-{-# LANGUAGE TypeOperators #-}
-{-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE FlexibleContexts #-}
-{-# LANGUAGE ViewPatterns #-}
-{-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE GADTs #-}
 {-# LANGUAGE RankNTypes #-}
+{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE TypeOperators #-}
+{-# LANGUAGE ViewPatterns #-}
 
 {-# OPTIONS_GHC -fplugin GHC.TypeLits.KnownNat.Solver #-}
 {-# OPTIONS_GHC -fplugin GHC.TypeLits.Normalise #-}
 
 module Numeric.Proximal.Static
-    ( Coord(..)
+    ( Fin(..)
     , atM
     , atV
     , fista
@@ -51,20 +52,29 @@ import           Data.Tuple.HT                  ( fst3 )
 -- replaced with something line Fin but that does not use peano numbers to
 -- encode this property.
 
--- | Type level natural meant as an index into a vector or matrix
-data Coord (n :: Nat) = Coord
+-- | Set of natural numbers < n ([0, ..., n - 1]). These are constructed
+-- using typelits, which has some convenient machinery and does not require
+-- the very inefficient Peano encoding.
+data Fin (n :: Nat) where
+  Fin :: (KnownNat k, k + 1 <= n) => Proxy k -> Fin n
+
+instance (KnownNat n) => Show (Fin n) where
+  show f = show (fromFin f)
+
+fromFin :: (KnownNat n) => Fin n -> Integer
+fromFin p = natVal p
 
 -- | Get a value from a vector at a given coordinate/index with guarantee
 -- that the element index is within the length of the vector at compile
 -- time.
 atV
-    :: forall n k
-     . (KnownNat n, KnownNat k, k + 1 <= n)
+    :: forall n
+     . (KnownNat n)
     => R n
-    -> Coord k
+    -> Fin n
     -> Double
-atV v _ = extract v LA.! pos
-    where pos = fromIntegral . natVal $ (undefined :: Proxy k)
+atV v c = extract v LA.! pos
+    where pos = fromIntegral . fromFin $ c
 
 -- | Get element from matrix at a given coordinate/index with guarantee that
 -- the element index is within the shape of the matrix at compile time.
@@ -72,8 +82,8 @@ atM
     :: forall m n i j
      . (KnownNat m, KnownNat n, KnownNat i, KnownNat j, i + 1 <= m, j + 1 <= n)
     => L m n
-    -> Coord i
-    -> Coord j
+    -> Fin i
+    -> Fin j
     -> Double
 atM m _ _ = extract m `LA.atIndex` (i, j)
   where
