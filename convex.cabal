@@ -18,6 +18,7 @@ extra-source-files:  README.md
 library
   -- Modules exported by the library.
   exposed-modules:
+    Data.Fin 
     Numeric.UnitaryRational
     Numeric.LinearAlgebra.MatrixFree
     Numeric.LinearAlgebra.Combinators
