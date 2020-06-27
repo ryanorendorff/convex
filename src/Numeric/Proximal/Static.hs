@@ -55,10 +55,10 @@ data Fin (n :: Nat) where
   Fin :: (KnownNat k, k + 1 <= n) => Proxy k -> Fin n
 
 instance (KnownNat n) => Show (Fin n) where
-  show f = show (fromFin f)
+  show f = show (fromFin f :: Integer)
 
-fromFin :: Fin n -> Integer
-fromFin (Fin p) = natVal p
+fromFin :: (Integral i) => Fin n -> i
+fromFin (Fin p) = fromIntegral $ natVal p
 
 -- | Get a value from a vector at a given coordinate/index with guarantee
 -- that the element index is within the length of the vector at compile
@@ -69,8 +69,7 @@ atV
     => R n
     -> Fin n
     -> Double
-atV v c = extract v LA.! pos
-    where pos = fromIntegral . fromFin $ c
+atV v p = extract v LA.! (fromFin p)
 
 -- | Get element from matrix at a given coordinate/index with guarantee that
 -- the element index is within the shape of the matrix at compile time.
@@ -81,10 +80,7 @@ atM
     -> Fin m
     -> Fin n
     -> Double
-atM mat m n = extract mat `LA.atIndex` (i, j)
-  where
-    i = fromIntegral . fromFin $ m
-    j = fromIntegral . fromFin $ n
+atM mat m n = extract mat `LA.atIndex` (fromFin m, fromFin n)
 
 -- | Fold a vector.
 foldR :: KnownNat n => (b -> Double -> b) -> b -> R n -> b
