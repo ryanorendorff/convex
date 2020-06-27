@@ -26,6 +26,9 @@ import           GHC.TypeLits
 -- level 'True, instead of saying that the size constraint (k + 1 <= n) is
 -- being violated.
 data Fin (n :: Nat) where
+  -- | Constructing a `Fin` is done with a `Proxy` object which stores the
+  -- type level natural that is within the bounds of `Fin n`.
+  -- `Fin (Proxy :: Proxy 3) :: Fin 4`
   Fin :: (KnownNat k, k + 1 <= n) => Proxy k -> Fin n
 
 instance (KnownNat n) => Show (Fin n) where
