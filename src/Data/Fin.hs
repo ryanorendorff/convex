@@ -8,6 +8,39 @@
 {-# OPTIONS_GHC -fplugin GHC.TypeLits.Normalise #-}
 
 
+
+{-|
+Module      : Data.Fin
+Description : Data type for set of natural numbers <= n
+Copyright   : (c) Ryan Orendorff, 2020
+License     : BSD3
+Stability   : experimental
+
+This module introduces `Fin`, which is a type that describes natural numbers
+less than it's index. For example, `Fin 3` can be inhabited by the numbers
+`[0, 1, 2]`.
+
+There are many ways to implement this data type, the most common being peano
+numbers. However this  implementation aims to do two things in particular.
+
+- Be efficient in the representation. Peano numbers take up $O(n)$ space
+  where $n$ is the actual number itself.
+- Work with the existing type level TypeLits framework and the GHC
+  extensions that make working with them easier ("GHC.TypeLits.Normalise"
+  and "GHC.TyleIts.KnowNat.Solver").
+
+The other approaches are great too! And more theoretically sound. Here is a
+list of similar modules on Hackage.
+
+- fin
+- finite-typelits
+- type-natural
+- peano
+- nat
+- PeanoWitnesses
+- type-combinators
+
+-}
 module Data.Fin
   ( Fin(..)
   , fromFin
