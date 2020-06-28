@@ -23,8 +23,8 @@ less than it's index. For example, `Fin 3` can be inhabited by the numbers
 There are many ways to implement this data type, the most common being peano
 numbers. However this  implementation aims to do two things in particular.
 
-- Be efficient in the representation. Peano numbers take up $O(n)$ space
-  where $n$ is the actual number itself.
+- Be efficient in the representation. Peano numbers take up \(O(n)\) space
+  where \(n\) is the actual number itself.
 - Work with the existing type level TypeLits framework and the GHC
   extensions that make working with them easier ("GHC.TypeLits.Normalise"
   and "GHC.TyleIts.KnowNat.Solver").
