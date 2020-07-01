@@ -8,8 +8,8 @@
 {-# OPTIONS_GHC -fplugin GHC.TypeLits.Normalise #-}
 
 {-|
-Module      : Data.Fin
-Description : Data type for set of natural numbers <= n
+Module      : Numeric.QuadraticProgramming.PQP.Static
+Description : Implementation of PQP QP solver using type level naturals
 Copyright   : (c) Ryan Orendorff, 2020
 License     : BSD3
 Stability   : experimental
