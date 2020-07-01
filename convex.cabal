@@ -18,12 +18,13 @@ extra-source-files:  README.md
 library
   -- Modules exported by the library.
   exposed-modules:
-    Data.Fin 
+    Data.Fin
     Numeric.UnitaryRational
     Numeric.LinearAlgebra.MatrixFree
     Numeric.LinearAlgebra.Combinators
     Numeric.LinearProgramming.L1.Static
     Numeric.LinearProgramming.LP.Static
+    Numeric.QuadraticProgramming.PQP.Static
     Numeric.Proximal.Static
     ControlSystems.DynamicSystems.Conversions
     ControlSystems.DynamicSystems.Conversions.Static
