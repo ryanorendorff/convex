@@ -35,8 +35,10 @@ import           Prelude                 hiding ( (<>) )
 -- | Solves the following quadratic program
 --
 -- \[
--- \textrm{min}_x\ \frac{1}{2} x^TAx + c^Tx \\
--- \textrm{s.t}\ B x <= d
+-- \begin{aligned}
+-- \min_x\ \ & \tfrac{1}{2} x^TAx + c^Tx \\
+-- \textrm{s.t}\ \ & B x \leq d
+-- \end{aligned}
 -- \]
 --
 -- where \(A\) is positive definite and the primal problem above is feasible.
@@ -60,10 +62,10 @@ import           Prelude                 hiding ( (<>) )
 --   (\(h^+ = \textrm{max}(Q, 0)\))
 pqp
     :: (KnownNat m, KnownNat n)
-    => L n n -- ^ Hessian of the quadratic program cost, A
-    -> R n   -- ^ Linear component of the quadratic program cost
-    -> L m n -- ^ Constraint matrix B
-    -> R m   -- ^ Constraint vector d
+    => L n n -- ^ Hessian of the quadratic program cost, \(A\)
+    -> R n   -- ^ Linear component of the quadratic program cost \(c\)
+    -> L m n -- ^ Constraint matrix \(B\)
+    -> R m   -- ^ Constraint vector \(d\)
     -> [R m] -- ^ Dual iterations
 
 -- Initial guess must be > 0. Absent a better heuristic we use 1.
@@ -103,10 +105,10 @@ pqp a c b d = iterate update (konst 1)
 -- \]
 dualToPrimalQPPoint
     :: (KnownNat m, KnownNat n)
-    => L n n -- ^ Hessian of the quadratic program cost, A
-    -> R n   -- ^ cost c
-    -> L m n -- ^ Constraint matrix B
-    -> R m   -- ^ Dual value y
+    => L n n -- ^ Hessian of the quadratic program cost, \(A\)
+    -> R n   -- ^ Linear cost \(c\)
+    -> L m n -- ^ Constraint matrix \(B\)
+    -> R m   -- ^ Dual value \(y\)
     -> R n   -- ^ Primal value
 dualToPrimalQPPoint a c b y = (-(inv a #> (c + (tr b) #> y)))
 
