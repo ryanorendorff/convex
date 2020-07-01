@@ -83,7 +83,7 @@ pqp a c b d = iterate update (konst 1)
     -- semidefinite.
     r      = max0m (-q) #> konst 1
 
-    hPlus = max0v h
+    hPlus  = max0v h
     hMinus = max0v (-h)
 
     qPlus  = max0m q + diag r
