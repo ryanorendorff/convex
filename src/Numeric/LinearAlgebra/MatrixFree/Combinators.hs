@@ -3,6 +3,16 @@
 {-# OPTIONS_GHC -fplugin GHC.TypeLits.KnownNat.Solver #-}
 {-# OPTIONS_GHC -fplugin GHC.TypeLits.Normalise #-}
 
+{-|
+Module      : Numeric.LinearAlgebra.MatrixFree.Static
+Description : Compose matrix-free linear maps
+Copyright   : (c) Ryan Orendorff, 2020
+License     : BSD3
+Stability   : experimental
+
+Enables the user to compose matrix-free `LinearMap` objects in the same way
+that one would compose regular matrices.
+-}
 module Numeric.LinearAlgebra.MatrixFree.Combinators
     ( (===)
     , (|||)
