@@ -1,8 +1,15 @@
-{-# LANGUAGE TypeOperators          #-}
+{-# LANGUAGE TypeOperators #-}
 
 {-# OPTIONS_GHC -fplugin GHC.TypeLits.KnownNat.Solver #-}
 {-# OPTIONS_GHC -fplugin GHC.TypeLits.Normalise #-}
 
+{-|
+Module      : Numeric.LinearAlgebra.Combinators
+Description : Compose matrices
+Copyright   : (c) Ryan Orendorff, 2020
+License     : BSD3
+Stability   : experimental
+-}
 module Numeric.LinearAlgebra.Combinators
     ( blockMatrix
     )
