@@ -21,20 +21,41 @@ jupyter-notebook
 
 ## TODOs
 
-- Making sure the examples in the repo and jupyter notebooks run.
-- Adding in new solvers, such as a second order cone solver.
-- Adding in capabilities to generate the matrices for certain problems with known structure, such as Model Predictive Control (MPC).
-- Matrix free SVD calculation.
+- Adding in new solvers (MIP, SOCP, ADMM, LMI)
+- Adding in capabilities to generate the matrices for certain problems with
+  known structure, such as Model Predictive Control (MPC).
+  - While attempting to do this, I have noticed that certain convenient
+    functions are not simple (or potentially possible) to type. For example,
+    if one would like to convert the following function
+    
+    ```
+    blockDiag :: [[Double]] -> Matrix Double
+    ```
+    
+    to a form that keeps track of the number of elements of each vector
+    
+    ```
+    -- We'd actually like to have variable `n` here instead of a list of all
+    -- the same `n`. This is what the forall implies.
+    blockDiag :: [forall n. Vector n Double] -> Matrix ? ? Double
+    ```
+    
+    but this does not seem to be possible. But potentially this is a good
+    typing feature; potentially the first one is an anti-pattern. It is
+    possible to do the following.
+    
+    ```
+    -- We'd actually like to have variable `n` here instead of a list of all
+    -- the same `n`. This is what the forall implies.
+    blockDiag :: Vector m (Vector n Double) -> Matrix (m * n) (m * n) Double
+    ```
+
+- Expand out matrix free 
+  - Larger suite of matrix free operators (convolution, fft, other transforms)
+  - Matrix free SVD calculation.
 - Use linear types! Potentially can get some more safety (and eventually
-  performance?) by constraining that the input matrices are used once.
-
-
-These ones I would love to get to but would probably be a separate project
-
-- Create a framework to optimize the linear algebra when certain properties of
-  a matrix are know (idempotency, hermitian, etc).
-- Perform some rewrites/fusion for the matrix free forms from a given expression
-- Verify that the rewrites are sound using Agda.
+  performance?) by constraining that the input matrices are used once. This
+  will require GHC 8.12 at the earliest.
 
 
 ## Abstract from LambdaConf 2019 talk
