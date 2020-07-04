@@ -32,23 +32,15 @@ jupyter-notebook
     blockDiag :: [[Double]] -> Matrix Double
     ```
     
-    to a form that keeps track of the number of elements of each vector
+    to a form that keeps track of the number of elements of each vector, one
+    can use existentials (encoded using a continuation in Haskell)
     
     ```
-    -- We'd actually like to have variable `n` here instead of a list of all
-    -- the same `n`. This is what the forall implies.
-    blockDiag :: [forall n. Vector n Double] -> Matrix ? ? Double
+    -- The existential allows us to have a list with differently sized vectors.
+    blockDiag :: [vecs :: exists n. Vector n Double] -> Matrix (sum (size vecs)) (sum (size vecs)) Double
     ```
     
-    but this does not seem to be possible. But potentially this is a good
-    typing feature; potentially the first one is an anti-pattern. It is
-    possible to do the following.
-    
-    ```
-    -- We'd actually like to have variable `n` here instead of a list of all
-    -- the same `n`. This is what the forall implies.
-    blockDiag :: Vector m (Vector n Double) -> Matrix (m * n) (m * n) Double
-    ```
+    I'm not quite sure how to write this out in Haskell yet. :-D
 
 - Expand out matrix free 
   - Larger suite of matrix free operators (convolution, fft, other transforms)
