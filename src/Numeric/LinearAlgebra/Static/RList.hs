@@ -21,6 +21,7 @@ module Numeric.LinearAlgebra.Static.RList
     ( RList(..)
     , Sum
     , exRList
+    , exRListSum
     -- , concat
     )
 where
@@ -47,8 +48,8 @@ exRList :: RList '[2, 3]
 exRList = konst 1 ::: konst 2 ::: RNil
 
 -- This does not work because the sum is not expanded
-exRList2 :: R (Sum '[2, 3])
-exRList2 = (konst 1 :: R 3) # (konst 2 :: R 2)
+exRListSum :: R (Sum '[2, 3])
+exRListSum = (konst 1 :: R 3) # (konst 2 :: R 2)
 
 -- There is no null vector. Also the HMatrix library does the wrong thing
 -- with this example.
@@ -57,6 +58,6 @@ exRList2 = (konst 1 :: R 3) # (konst 2 :: R 2)
 -- (vector [4.0,4.0,0.0] :: R 2)
 -- This does not work but I think it is because I have lost the size of the
 -- vector, so the size of r and rs are not known to the compiler.
-concat :: RList ns -> R (Sum ns)
-concat (r ::: RNil) = r
-concat (r ::: rs) = r # (concat rs)
+-- concat :: RList ns -> R (Sum ns)
+-- concat (r ::: RNil) = r
+-- concat (r ::: rs) = r # (concat rs)
