@@ -22,6 +22,7 @@ library
     Numeric.UnitaryRational
     Numeric.LinearAlgebra.MatrixFree
     Numeric.LinearAlgebra.Static.Util
+    Numeric.LinearAlgebra.Static.RList
     Numeric.LinearAlgebra.MatrixFree.Combinators
     Numeric.LinearAlgebra.Combinators
     Numeric.LinearProgramming.L1.Static
@@ -47,7 +48,7 @@ library
     , vector
     , random
     , utility-ht
-    , base >=4.10.1.0
+    , base >=4.10.1.0 
                 
 
   -- Directories containing source files.
