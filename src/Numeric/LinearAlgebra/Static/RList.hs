@@ -47,7 +47,8 @@ infixr 6 :::
 exRList :: RList '[2, 3]
 exRList = konst 1 ::: konst 2 ::: RNil
 
--- This does not work because the sum is not expanded
+-- Notice that the result only has to be a R 5 sized vector; doesn't really
+-- matter how one gets there.
 exRListSum :: R (Sum '[2, 3])
 exRListSum = (konst 1 :: R 3) # (konst 2 :: R 2)
 
@@ -56,6 +57,7 @@ exRListSum = (konst 1 :: R 3) # (konst 2 :: R 2)
 --
 -- λ> (konst 4 :: R 2) # (konst 0 :: R 0)
 -- (vector [4.0,4.0,0.0] :: R 2)
+
 -- This does not work but I think it is because I have lost the size of the
 -- vector, so the size of r and rs are not known to the compiler.
 -- concat :: RList ns -> R (Sum ns)
