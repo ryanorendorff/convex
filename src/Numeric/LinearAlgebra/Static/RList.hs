@@ -21,7 +21,6 @@ module Numeric.LinearAlgebra.Static.RList
     ( RList(..)
     , Sum
     , exRList
-    , exRListSum
     -- , concat
     )
 where
@@ -47,10 +46,6 @@ infixr 6 :::
 exRList :: RList '[2, 3]
 exRList = konst 1 ::: konst 2 ::: RNil
 
--- Notice that the result only has to be a R 5 sized vector; doesn't really
--- matter how one gets there.
-exRListSum :: R (Sum '[2, 3])
-exRListSum = (konst 1 :: R 3) # (konst 2 :: R 2)
 
 -- There is no null vector. Also the HMatrix library does the wrong thing
 -- with this example.
