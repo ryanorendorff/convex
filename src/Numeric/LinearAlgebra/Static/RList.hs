@@ -21,7 +21,7 @@ module Numeric.LinearAlgebra.Static.RList
     ( RList(..)
     , Sum
     , exRList
-    -- , concat
+    , concat
     )
 where
 
@@ -55,8 +55,20 @@ exRList = konst 1 ::: ROne (konst 2)
 -- λ> (konst 4 :: R 2) # (konst 0 :: R 0)
 -- (vector [4.0,4.0,0.0] :: R 2)
 
--- This does not work but I think it is because I have lost the size of the
--- vector, so the size of r and rs are not known to the compiler.
--- concat :: RList ns -> R (Sum ns)
--- concat (r ::: RNil) = r
--- concat (r ::: rs) = r # (concat rs)
+-- | Concatenate an RList of vectors
+--
+-- Thank you Christiaan Baaij for figuring out how to do concat! This is
+-- basically his solution to the problem, with a modification to work with
+-- the non-empty version of RList. See the following gist for more details:
+-- https://gist.github.com/ryanorendorff/d05c378b71829e3c0c33de462cb9a973
+concat :: RList ns -> R (Sum ns)
+concat rs = case concatWorker rs of
+  RWorker rsW -> rsW
+
+data RWorker n where
+  RWorker :: KnownNat n => R n -> RWorker n
+
+concatWorker :: RList ns -> RWorker (Sum ns)
+concatWorker (ROne r) = RWorker r
+concatWorker (r ::: rs) = case concatWorker rs of
+  RWorker rsW -> RWorker (r # rsW)
