@@ -36,16 +36,18 @@ type family Sum (xs :: [Nat]) where
     Sum '[] = 0
     Sum (n ': ns) = n + Sum ns
 
+-- | A non-empty list of `R` vectors of different sizes.
+-- The list is non-empty since we cannot create a vector of size 0 in a
+-- reasonable way when using Data.Vector as the backend (as HMatrix).
 data RList (ns :: [Nat]) where
-    RNil :: RList '[]
+    ROne :: (KnownNat n) => R n -> RList '[n]
     (:::) :: (KnownNat n) => R n -> RList ns -> RList (n ': ns)
 
 infixr 6 :::
 
--- | An example of how to construct an RList
+-- | An example of how to construct an RList.
 exRList :: RList '[2, 3]
-exRList = konst 1 ::: konst 2 ::: RNil
-
+exRList = konst 1 ::: ROne (konst 2)
 
 -- There is no null vector. Also the HMatrix library does the wrong thing
 -- with this example.
