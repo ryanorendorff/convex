@@ -19,9 +19,11 @@ Stability   : experimental
 -}
 module Numeric.LinearAlgebra.Static.RList
     ( RList(..)
+    , LList(..)
     , Sum
     , exRList
     , concat
+    , blockDiag
     )
 where
 
@@ -72,3 +74,26 @@ concatWorker :: RList ns -> RWorker (Sum ns)
 concatWorker (ROne r) = RWorker r
 concatWorker (r ::: rs) = case concatWorker rs of
   RWorker rsW -> RWorker (r # rsW)
+
+
+-- | A non-empty list of `L` matrices of different sizes.
+-- The list is non-empty since we cannot create a matrix of size 0 in a
+-- reasonable way when using Data.Vector as the backend (as HMatrix).
+data LList (ms :: [Nat]) (ns :: [Nat]) where
+    LOne :: (KnownNat m, KnownNat n) => L m n -> LList '[m] '[n]
+    (:-:) :: (KnownNat m, KnownNat n) => L m n -> LList ms ns
+                                      -> LList (m ': ms) (n ': ns)
+
+
+-- | Concatenate a LList of matrices as a block diagonal.
+blockDiag :: LList ms ns -> L (Sum ms) (Sum ns)
+blockDiag ls = case blockDiagWorker ls of
+  LWorker lsW -> lsW
+
+data LWorker m n where
+  LWorker :: (KnownNat m, KnownNat n) => L m n -> LWorker m n
+
+blockDiagWorker :: LList ms ns -> LWorker (Sum ms) (Sum ns)
+blockDiagWorker (LOne l) = LWorker l
+blockDiagWorker (l :-: ls) = case blockDiagWorker ls of
+  LWorker lsW -> LWorker (l ||| konst 0 === konst 0 ||| lsW)
