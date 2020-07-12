@@ -22,6 +22,7 @@ module Numeric.LinearAlgebra.MatrixFree
     , fromL
     , innerDimsFree
     , toL
+    , konst
     )
 where
 
@@ -29,7 +30,8 @@ import           Data.Proxy                     ( Proxy(..) )
 import           Data.Type.Equality             ( (:~:)(Refl) )
 import           GHC.TypeLits
 import           Numeric.LinearAlgebra          ( Transposable(..) )
-import           Numeric.LinearAlgebra.Static
+import           Numeric.LinearAlgebra.Static hiding (konst)
+import qualified Numeric.LinearAlgebra.Static  as LS
 import qualified Data.Vector.Storable          as V
 
 
@@ -37,7 +39,7 @@ import qualified Data.Vector.Storable          as V
 data LinearMap (m :: Nat) (n :: Nat) where
   LinearMap :: (KnownNat m, KnownNat n) =>
                (R n -> R m) -- ^ Forward Function
-            -> (R m -> R n) -- ^ Adjoint Function
+            -> (R m -> R n) -- ^ Adjoint FunctionLS
             -> LinearMap m n
 
 instance Transposable (LinearMap n m) (LinearMap m n) where
@@ -84,12 +86,21 @@ avg v = v <.> 1 / n' where n' = fromIntegral . natVal $ (Proxy :: Proxy n)
 
 -- | mean(v) * 1, where 1 is the ones vector. of length v.
 avgRepeatedFree :: (KnownNat n) => LinearMap n n
-avgRepeatedFree = LinearMap f f where f v = konst (avg v)
+avgRepeatedFree = LinearMap f f where f v = LS.konst (avg v)
 
 
 -- | Remove the average value of a vector from each element of the vector.
 removeAvg :: (KnownNat n) => LinearMap n n
 removeAvg = eyeFree +# ((-1) *# avgRepeatedFree)
+
+
+-- | The constant matrix, which sums the vector and sets every element of
+-- the resulting vector to that sum
+konst :: (KnownNat m, KnownNat n) => Double -> LinearMap m n
+konst k = LinearMap sumAndRepeat sumAndRepeat
+  where
+    sumAndRepeat :: (KnownNat p, KnownNat q) => R p -> R q
+    sumAndRepeat v = LS.konst (v <.> LS.konst k)
 
 -- TODO: Define fft in matrix free form using FFT and IFFT
 
@@ -116,7 +127,7 @@ infixr 8 <#>
 
 -- | Multiply a LinearMap matrix by a constant real number
 (*#) :: (KnownNat m, KnownNat n) => Double -> LinearMap m n -> LinearMap m n
-(*#) s (LinearMap f a) = LinearMap (\v -> konst s * f v) (\v -> konst s * a v)
+(*#) s (LinearMap f a) = LinearMap (\v -> LS.konst s * f v) (\v -> LS.konst s * a v)
 infixr 8 *#
 
 
