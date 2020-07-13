@@ -1,3 +1,6 @@
+{-# LANGUAGE DataKinds #-}
+{-# LANGUAGE KindSignatures #-}
+{-# LANGUAGE GADTs #-}
 {-# LANGUAGE TypeOperators #-}
 
 {-# OPTIONS_GHC -fplugin GHC.TypeLits.KnownNat.Solver #-}
@@ -17,6 +20,7 @@ module Numeric.LinearAlgebra.MatrixFree.Combinators
     ( (===)
     , (|||)
     , blockMatrix
+    , blockDiag
     )
 where
 
@@ -25,7 +29,8 @@ import           Numeric.LinearAlgebra.Static   ( (#)
                                                 , split
                                                 )
 import           Numeric.LinearAlgebra.MatrixFree
-                                                ( LinearMap(..) )
+                                                ( LinearMap(..))
+import           Numeric.LinearAlgebra.Static.RList (Sum)
 
 -- | Vertically concatenate two `LinearMap`s \(\begin{bmatrix}A\\B\end{bmatrix}\)
 (===) :: LinearMap m n -> LinearMap p n -> LinearMap (m + p) n
@@ -61,7 +66,36 @@ blockMatrix
     -> LinearMap (m + q) (n + p) -- ^ Resulting block matrix
 blockMatrix a b c d = a ||| b === c ||| d
 
--- Can this function be written? Maybe require the impredicate work SPJ
--- talked about recently (shot in the dark there).
--- blockDiag
---     :: [(forall m n. LinearMap m n)] -> ???
+
+-- | A non-empty list of `LinearMap` matrices of different sizes.
+data LinearMapList (ms :: [Nat]) (ns :: [Nat]) where
+    LOne :: (KnownNat m, KnownNat n) => LinearMap m n -> LinearMapList '[m] '[n]
+    (:-:) :: (KnownNat m, KnownNat n) => LinearMap m n -> LinearMapList ms ns
+                                      -> LinearMapList (m ': ms) (n ': ns)
+
+
+-- | Concatenate a `LinearMapList` of `LinearMap`s as a block diagonal.
+-- Note that this has poor performance; it runs `split` on the
+-- input vector O(n) times, where n is the number of entries in the list.
+blockDiag :: LinearMapList ms ns -> LinearMap (Sum ms) (Sum ns)
+blockDiag ls = case blockDiagWorker ls of
+  LWorker lsW -> lsW
+
+data LWorker m n where
+  LWorker :: (KnownNat m, KnownNat n) => LinearMap m n -> LWorker m n
+
+blockDiagWorker :: LinearMapList ms ns -> LWorker (Sum ms) (Sum ns)
+blockDiagWorker (LOne l) = LWorker l
+blockDiagWorker (l :-: ls) = case blockDiagWorker ls of
+  LWorker lsW -> LWorker (diag2 l lsW)
+
+-- Combine two `LinearMap`s on a diagonal without having to use
+-- konst 0, which would just be a waste of processing time (sum a list and
+-- multiply it by zero)
+diag2 :: LinearMap m n -> LinearMap p q -> LinearMap (m + p) (n + q)
+diag2 (LinearMap f1 a1) (LinearMap f2 a2) = LinearMap fDiag2d aDiag2d
+  where
+    fDiag2d v = let (v1, v2) = split v in
+      (f1 v1) # (f2 v2)
+    aDiag2d v = let (v1, v2) = split v in
+      (a1 v1) # (a2 v2)
