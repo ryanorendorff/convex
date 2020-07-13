@@ -23,6 +23,8 @@ module Numeric.LinearAlgebra.MatrixFree
     , innerDimsFree
     , toL
     , konst
+    , forward
+    , adjoint
     )
 where
 
@@ -41,6 +43,14 @@ data LinearMap (m :: Nat) (n :: Nat) where
                (R n -> R m) -- ^ Forward Function
             -> (R m -> R n) -- ^ Adjoint FunctionLS
             -> LinearMap m n
+
+-- | Extract the foward function from a `LinearMap`
+forward :: LinearMap m n -> (R n -> R m)
+forward (LinearMap f _) = f
+
+-- | Extract the adjoint function from a `LinearMap`
+adjoint :: LinearMap m n -> (R m -> R n)
+adjoint (LinearMap _ a) = a
 
 instance Transposable (LinearMap n m) (LinearMap m n) where
    -- We do not have different functions for conjugate transposes in the
