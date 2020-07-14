@@ -7,6 +7,13 @@
 {-# OPTIONS_GHC -fplugin GHC.TypeLits.KnownNat.Solver #-}
 {-# OPTIONS_GHC -fplugin GHC.TypeLits.Normalise #-}
 
+{-|
+Module      : Numeric.UnitaryRational
+Description : Data type that is constrained to be between 0 and 1 using types.
+Copyright   : (c) Ryan Orendorff, 2020
+License     : BSD3
+Stability   : experimental
+-}
 module Numeric.UnitaryRational
     ( UnitaryRational(..)
     , unitaryToPair

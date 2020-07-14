@@ -21,6 +21,7 @@ module Numeric.LinearAlgebra.MatrixFree.Combinators
     , (|||)
     , blockMatrix
     , blockDiag
+    , LinearMapList(..)
     )
 where
 
@@ -67,14 +68,14 @@ blockMatrix
 blockMatrix a b c d = a ||| b === c ||| d
 
 
--- | A non-empty list of `LinearMap` matrices of different sizes.
+-- | A non-empty list of "LinearMap" matrices of different sizes.
 data LinearMapList (ms :: [Nat]) (ns :: [Nat]) where
     LOne :: (KnownNat m, KnownNat n) => LinearMap m n -> LinearMapList '[m] '[n]
     (:-:) :: (KnownNat m, KnownNat n) => LinearMap m n -> LinearMapList ms ns
                                       -> LinearMapList (m ': ms) (n ': ns)
 
 
--- | Concatenate a `LinearMapList` of `LinearMap`s as a block diagonal.
+-- | Concatenate a "LinearMapList" of "LinearMap"s as a block diagonal.
 -- Note that this has poor performance; it runs `split` on the
 -- input vector O(n) times, where n is the number of entries in the list.
 blockDiag :: LinearMapList ms ns -> LinearMap (Sum ms) (Sum ns)

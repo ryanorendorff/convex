@@ -13,7 +13,13 @@
 {-# OPTIONS_GHC -fplugin GHC.TypeLits.Normalise #-}
 
 
-
+{-|
+Module      : Numeric.LinearProgramming.LP.Static
+Description : Solve linear programs using static vectors/matrices.
+Copyright   : (c) Ryan Orendorff, 2020
+License     : BSD3
+Stability   : experimental
+-}
 module Numeric.LinearProgramming.LP.Static (
   affineScaling
 )

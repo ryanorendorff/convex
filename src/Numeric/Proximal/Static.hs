@@ -10,6 +10,13 @@
 {-# OPTIONS_GHC -fplugin GHC.TypeLits.KnownNat.Solver #-}
 {-# OPTIONS_GHC -fplugin GHC.TypeLits.Normalise #-}
 
+{-|
+Module      : Numeric.Proximal.Static
+Description : Solve proximal problems using FISTA
+Copyright   : (c) Ryan Orendorff, 2020
+License     : BSD3
+Stability   : experimental
+-}
 module Numeric.Proximal.Static
     ( fista
     , fistaCost
@@ -36,9 +43,11 @@ import           Data.Tuple.HT                  ( fst3 )
 -- TODO: Implement solution for extracting k largest eigenvalues directly.
 
 -- Note that these are not particularly efficient as each eigenvalue must be extracted and then searched through to find the maximum.
+-- | Find the Lipschitz constant for a least squares problem.
 lsqLipschitz :: (KnownNat m, KnownNat n) => L m n -> Double
 lsqLipschitz a = foldR1 max . eigenvalues $ mTm a
 
+-- | Find the Lipschitz constant for a quadratic program.
 quadraticLipschitz :: (KnownNat n) => Sym n -> Double
 quadraticLipschitz = foldR1 max . eigenvalues
 
@@ -102,8 +111,8 @@ residuals x = zipWith (\y yn -> norm_2 (y - yn)) x (tail x)
 --                        Cost Functions                       --
 -----------------------------------------------------------------
 
--- | Takes the most smooth convex function `f` and the convex (potentially
--- non-smooth) function `g` and calculates the cost of a given input.
+-- | Takes the most smooth convex function \(f\) and the convex (potentially
+-- non-smooth) function \(g\) and calculates the cost of a given input.
 fistaCost :: (R n -> Double) -> (R n -> Double) -> R n -> Double
 fistaCost f g x = f x + g x
 
