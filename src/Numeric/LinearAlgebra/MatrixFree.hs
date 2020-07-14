@@ -9,6 +9,13 @@
 {-# OPTIONS_GHC -fplugin GHC.TypeLits.KnownNat.Solver #-}
 {-# OPTIONS_GHC -fplugin GHC.TypeLits.Normalise #-}
 
+{-|
+Module      : Numeric.LinearAlgebra.MatrixFree
+Description : Represent matrices as a pair of functions for forward and adjoint.
+Copyright   : (c) Ryan Orendorff, 2020
+License     : BSD3
+Stability   : experimental
+-}
 module Numeric.LinearAlgebra.MatrixFree
     ( LinearMap(..)
     , (##>)

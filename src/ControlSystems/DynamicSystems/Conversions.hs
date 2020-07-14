@@ -1,3 +1,10 @@
+{-|
+Module      : ControlSystems.DynamicSystems.Conversion
+Description : Converts continuous time systems to discrete time
+Copyright   : (c) Ryan Orendorff, 2020
+License     : BSD3
+Stability   : experimental
+-}
 module ControlSystems.DynamicSystems.Conversions (
   c2d
 )

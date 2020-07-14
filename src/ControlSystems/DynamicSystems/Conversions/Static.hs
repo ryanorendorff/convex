@@ -10,6 +10,13 @@
 -- The unused variables are left as documentation
 {-# OPTIONS -Wno-unused-local-binds #-}
 
+{-|
+Module      : ControlSystems.DynamicSystems.Conversion
+Description : Converts continuous time systems to discrete time, using static vectors.
+Copyright   : (c) Ryan Orendorff, 2020
+License     : BSD3
+Stability   : experimental
+-}
 module ControlSystems.DynamicSystems.Conversions.Static (
   c2d
 ) where

@@ -2,6 +2,14 @@
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE ViewPatterns #-}
 
+-- TODO: This module is in the wrong module (these are not linear programs)
+{-|
+Module      : Numeric.LinearProgramming.L1.Static
+Description : Solve l1 programs with static vectors/matrices.
+Copyright   : (c) Ryan Orendorff, 2020
+License     : BSD3
+Stability   : experimental
+-}
 module Numeric.LinearProgramming.L1.Static (
   l1Solve,
   l1SolveGT,
