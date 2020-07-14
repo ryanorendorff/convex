@@ -5,6 +5,7 @@
 {-# LANGUAGE TypeOperators #-}
 {-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE UndecidableInstances #-}
+{-# LANGUAGE RankNTypes #-}
 {-# LANGUAGE AllowAmbiguousTypes #-}
 
 {-# OPTIONS_GHC -fplugin GHC.TypeLits.KnownNat.Solver #-}
@@ -24,6 +25,8 @@ module Numeric.LinearAlgebra.Static.RList
     , exRList
     , concat
     , blockDiag
+    , mapRListSquare
+    , applyLList
     )
 where
 
@@ -97,3 +100,26 @@ blockDiagWorker :: LList ms ns -> LWorker (Sum ms) (Sum ns)
 blockDiagWorker (LOne l) = LWorker l
 blockDiagWorker (l :-: ls) = case blockDiagWorker ls of
   LWorker lsW -> LWorker (l ||| konst 0 === konst 0 ||| lsW)
+
+-- | Map some function that preserves the dimension of the vector (a square
+-- matrix) over a list of vectors.
+mapRListSquare :: (forall n. KnownNat n => R n -> R n)
+               -> RList ns -> RList ns
+mapRListSquare f (ROne r) = ROne (f r)
+mapRListSquare f (r ::: rs) = f r ::: mapRListSquare f rs
+
+-- I have not proved that the LList and RList are the same length, so GHC
+-- complains that I have non-exhaustive patterns that cannot be constructed.
+-- TODO: Add comment on how this would work in Agda to show how this type
+-- of error would be avoided.
+-- | Apply a list of static matrices over a list of static vectors
+applyLList :: LList ms ns -> RList ns -> RList ms
+applyLList (LOne _) (_ ::: _) = error "This case is impossible"
+applyLList (_ :-: _) (ROne _) = error "This case is impossible"
+applyLList (LOne l) (ROne r) = ROne (l #> r)
+applyLList (l :-: ls) (r ::: rs) = (l #> r) ::: applyLList ls rs
+
+-- This function is more complicated, may need to reflect out the position
+-- we are in the list in order to write this function.
+-- splitRList :: R (Sum ns) -> RList ns
+-- splitRList vec = let (r, rs) = split vec in r ::: (splitRList rs)
