@@ -22,6 +22,7 @@ module Numeric.LinearAlgebra.MatrixFree.Combinators
     , blockMatrix
     , blockDiag
     , LinearMapList(..)
+    , applyLinearMapList
     )
 where
 
@@ -30,8 +31,8 @@ import           Numeric.LinearAlgebra.Static   ( (#)
                                                 , split
                                                 )
 import           Numeric.LinearAlgebra.MatrixFree
-                                                ( LinearMap(..))
-import           Numeric.LinearAlgebra.Static.RList (Sum)
+                                                ( LinearMap(..), forward)
+import           Numeric.LinearAlgebra.Static.RList (Sum, RList(..))
 
 -- | Vertically concatenate two `LinearMap`s \(\begin{bmatrix}A\\B\end{bmatrix}\)
 (===) :: LinearMap m n -> LinearMap p n -> LinearMap (m + p) n
@@ -100,3 +101,11 @@ diag2 (LinearMap f1 a1) (LinearMap f2 a2) = LinearMap fDiag2d aDiag2d
       (f1 v1) # (f2 v2)
     aDiag2d v = let (v1, v2) = split v in
       (a1 v1) # (a2 v2)
+
+
+-- | Apply a list of "LinearMap"s over a list of static vectors
+applyLinearMapList :: LinearMapList ms ns -> RList ns -> RList ms
+applyLinearMapList (LOne _) (_ ::: _) = error "This case is impossible"
+applyLinearMapList (_ :-: _) (ROne _) = error "This case is impossible"
+applyLinearMapList (LOne l) (ROne r) = ROne (forward l r)
+applyLinearMapList (l :-: ls) (r ::: rs) = (forward l r) ::: applyLinearMapList ls rs
