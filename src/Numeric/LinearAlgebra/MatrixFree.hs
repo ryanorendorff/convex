@@ -30,6 +30,7 @@ module Numeric.LinearAlgebra.MatrixFree
     , innerDimsFree
     , toL
     , konst
+    , diag
     , forward
     , adjoint
     )
@@ -39,7 +40,7 @@ import           Data.Proxy                     ( Proxy(..) )
 import           Data.Type.Equality             ( (:~:)(Refl) )
 import           GHC.TypeLits
 import           Numeric.LinearAlgebra          ( Transposable(..) )
-import           Numeric.LinearAlgebra.Static hiding (konst)
+import           Numeric.LinearAlgebra.Static hiding (konst, diag)
 import qualified Numeric.LinearAlgebra.Static  as LS
 import qualified Data.Vector.Storable          as V
 
@@ -118,6 +119,11 @@ konst k = LinearMap sumAndRepeat sumAndRepeat
   where
     sumAndRepeat :: (KnownNat p, KnownNat q) => R p -> R q
     sumAndRepeat v = LS.konst (v <.> LS.konst k)
+
+diag :: (KnownNat n) => R n -> LinearMap n n
+diag r = LinearMap f f
+  where
+    f v = zipWithVector (*) r v
 
 -- TODO: Define fft in matrix free form using FFT and IFFT
 
