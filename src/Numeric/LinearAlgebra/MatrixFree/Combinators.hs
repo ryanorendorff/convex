@@ -27,11 +27,13 @@ module Numeric.LinearAlgebra.MatrixFree.Combinators
 where
 
 import           GHC.TypeLits
+import           Numeric.LinearAlgebra          ( Transposable(..) )
 import           Numeric.LinearAlgebra.Static   ( (#)
                                                 , split
+                                                , R
                                                 )
 import           Numeric.LinearAlgebra.MatrixFree
-                                                ( LinearMap(..), forward)
+                                                ( LinearMap(..), (##>))
 import           Numeric.LinearAlgebra.Static.RList (Sum, RList(..))
 
 -- | Vertically concatenate two `LinearMap`s \(\begin{bmatrix}A\\B\end{bmatrix}\)
@@ -94,18 +96,21 @@ blockDiagWorker (l :-: ls) = case blockDiagWorker ls of
 -- Combine two `LinearMap`s on a diagonal without having to use
 -- konst 0, which would just be a waste of processing time (sum a list and
 -- multiply it by zero)
-diag2 :: LinearMap m n -> LinearMap p q -> LinearMap (m + p) (n + q)
-diag2 (LinearMap f1 a1) (LinearMap f2 a2) = LinearMap fDiag2d aDiag2d
+diag2 :: (KnownNat m, KnownNat n, KnownNat p, KnownNat q)
+      => LinearMap m n
+      -> LinearMap p q
+      -> LinearMap (m + p) (n + q)
+diag2 la lb = LinearMap (f la lb) (f (tr la) (tr lb))
   where
-    fDiag2d v = let (v1, v2) = split v in
-      (f1 v1) # (f2 v2)
-    aDiag2d v = let (v1, v2) = split v in
-      (a1 v1) # (a2 v2)
+    f :: (KnownNat m', KnownNat n', KnownNat p', KnownNat q')
+      => LinearMap m' n' -> LinearMap p' q' -> R (n' + q') -> R (m' + p')
+    f l1 l2 v = let (v1, v2) = split v in
+      (l1 ##> v1) # (l2 ##> v2)
 
 
 -- | Apply a list of "LinearMap"s over a list of static vectors
 applyLinearMapList :: LinearMapList ms ns -> RList ns -> RList ms
 applyLinearMapList (LOne _) (_ ::: _) = error "This case is impossible"
 applyLinearMapList (_ :-: _) (ROne _) = error "This case is impossible"
-applyLinearMapList (LOne l) (ROne r) = ROne (forward l r)
-applyLinearMapList (l :-: ls) (r ::: rs) = (forward l r) ::: applyLinearMapList ls rs
+applyLinearMapList (LOne l) (ROne r) = ROne (l ##> r)
+applyLinearMapList (l :-: ls) (r ::: rs) = (l ##> r) ::: applyLinearMapList ls rs
