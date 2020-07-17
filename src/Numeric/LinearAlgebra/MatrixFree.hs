@@ -135,8 +135,8 @@ diag r = LinearMap f f
 (##>) :: LinearMap n m -> R m -> R n
 (##>) (LinearMap f _) = f
 
-
 infixr 8 ##>
+
 
 -- | Matrix multiply of two `LinearMap`s
 (<#>) :: LinearMap m n
@@ -151,6 +151,7 @@ infixr 8 <#>
 -- | Multiply a LinearMap matrix by a constant real number
 (*#) :: (KnownNat m, KnownNat n) => Double -> LinearMap m n -> LinearMap m n
 (*#) s (LinearMap f a) = LinearMap (\v -> LS.konst s * f v) (\v -> LS.konst s * a v)
+
 infixr 8 *#
 
 
