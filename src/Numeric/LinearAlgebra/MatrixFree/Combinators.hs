@@ -36,24 +36,33 @@ import           Numeric.LinearAlgebra.MatrixFree
                                                 ( LinearMap(..), (##>))
 import           Numeric.LinearAlgebra.Static.RList (Sum, RList(..))
 
+-- Stacking matrices either horizontally or vertically are linked through a
+-- transpose, so the underlying functions are shared between the two
+-- stacking cases. Only in a switched order.
+stackLinearMaps :: (KnownNat m, KnownNat n)
+                => LinearMap m p -> LinearMap n p -> R p -> R (m + n)
+stackLinearMaps la lb v = la ##> v # lb ##> v
+
+addLinearMaps :: (KnownNat n, KnownNat p)
+              => LinearMap m n -> LinearMap m p -> R (n + p) -> R m
+addLinearMaps la lb v = let (v1, v2) = split v in la ##> v1 + lb ##> v2
+
+
 -- | Vertically concatenate two `LinearMap`s \(\begin{bmatrix}A\\B\end{bmatrix}\)
-(===) :: LinearMap m n -> LinearMap p n -> LinearMap (m + p) n
-(===) (LinearMap f_top t_top) (LinearMap f_bot t_bot) = LinearMap f t
-  where
-    f v = f_top v # f_bot v
-    t v = let (v1, v2) = split v in t_top v1 + t_bot v2
+(===) :: (KnownNat m, KnownNat n, KnownNat p)
+      => LinearMap m n -> LinearMap p n -> LinearMap (m + p) n
+(===) la lb = LinearMap (stackLinearMaps la lb) (addLinearMaps (tr la) (tr lb))
 
 infixl 2 ===
 
 
 -- | Horizontally concatenate two `LinearMap`s \(\begin{bmatrix}A&B\end{bmatrix}\)
-(|||) :: LinearMap m n -> LinearMap m p -> LinearMap m (n + p)
-(|||) (LinearMap f_top t_top) (LinearMap f_bot t_bot) = LinearMap f t
-  where
-    f v = let (v1, v2) = split v in f_top v1 + f_bot v2
-    t v = t_top v # t_bot v
+(|||) :: (KnownNat m, KnownNat n, KnownNat p)
+      => LinearMap m n -> LinearMap m p -> LinearMap m (n + p)
+(|||) la lb = tr (tr la === tr lb)
 
 infixl 3 |||
+
 
 -- | Generate a block matrix from four `LinearMap`s
 -- \[
@@ -63,7 +72,8 @@ infixl 3 |||
 -- \end{bmatrix}
 -- \]
 blockMatrix
-    :: LinearMap m n             -- ^ Upper left matrix
+    :: (KnownNat m, KnownNat n, KnownNat p, KnownNat q)
+    => LinearMap m n             -- ^ Upper left matrix
     -> LinearMap m p             -- ^ Upper right matrix
     -> LinearMap q n             -- ^ Lower left matrix
     -> LinearMap q p             -- ^ Lower right matrix
