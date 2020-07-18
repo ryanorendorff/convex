@@ -120,6 +120,7 @@ konst k = LinearMap sumAndRepeat sumAndRepeat
     sumAndRepeat :: (KnownNat p, KnownNat q) => R p -> R q
     sumAndRepeat v = LS.konst (v <.> LS.konst k)
 
+-- | Convert a vector into a diagonal matrix
 diag :: (KnownNat n) => R n -> LinearMap n n
 diag r = LinearMap f f
   where
