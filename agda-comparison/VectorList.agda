@@ -7,9 +7,9 @@ open import Data.Product as Prod using (∃; ∃₂; _×_; _,_)
 
 -- At the moment, `VectorList` is named `RList` in the Haskell code.
 data VectorList (A : Set) : List ℕ → Set where
-  []ⱽᴸ : VectorList A []ᴸ
+  []ⱽᴸ  : VectorList A []ᴸ
   _∷ⱽᴸ_ : {n : ℕ} {ns : List ℕ} → Vec A n → VectorList A ns
-                               → VectorList A (n ∷ᴸ ns)
+                                → VectorList A (n ∷ᴸ ns)
 infixr 5 _∷ⱽᴸ_
 
 concat : {A : Set} {ns : List ℕ} → VectorList A ns → Vec A (sum ns)
