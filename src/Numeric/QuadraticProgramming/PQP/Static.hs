@@ -66,10 +66,10 @@ pqp
     -> R n   -- ^ Linear component of the quadratic program cost \(c\)
     -> L m n -- ^ Constraint matrix \(B\)
     -> R m   -- ^ Constraint vector \(d\)
-    -> [R m] -- ^ Dual iterations
+    -> [(R m, R n)] -- ^ Dual and primal iterations
 
 -- Initial guess must be > 0. Absent a better heuristic we use 1.
-pqp a c b d = iterate update (konst 1)
+pqp a c b d = iterate update (konst 1, toPrimal (konst 1))
   where
     -- Lift max functions from operating on doubles to operating on vectors
     -- and matrices
@@ -91,12 +91,16 @@ pqp a c b d = iterate update (konst 1)
     qPlus  = max0m q + diag r
     qMinus = max0m (-q) + diag r
 
+    toPrimal = dualToPrimalQPPoint a c b
+
     -- Normally this is written out for each element index individually,
     -- which makes this problem embarassingly parallel. However, we are not
     -- concerned about the parallelizability but that the algorithm is
     -- implemented correctly. There is a part that is not parallel (Q⁺y,
     -- Q⁻y), but ideally the matrix-vector multiply is fast.
-    update y = y * ((hMinus + (qMinus #> y)) / (hPlus + (qPlus #> y)))
+    update (y, _) = let y' = y * ((hMinus + (qMinus #> y)) /
+                                  (hPlus + (qPlus #> y)))
+                    in (y', toPrimal y')
 
 -- | Convert a point in the dual space to the primal space using the formula
 --
