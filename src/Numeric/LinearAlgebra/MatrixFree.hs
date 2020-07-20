@@ -113,14 +113,14 @@ removeAvg = eyeFree +# ((-1) *# avgRepeatedFree)
 
 
 -- | The constant matrix, which sums the vector and sets every element of
--- the resulting vector to that sum
+-- the resulting vector to that sum.
 konst :: (KnownNat m, KnownNat n) => Double -> LinearMap m n
 konst k = LinearMap sumAndRepeat sumAndRepeat
   where
     sumAndRepeat :: (KnownNat p, KnownNat q) => R p -> R q
     sumAndRepeat v = LS.konst (v <.> LS.konst k)
 
--- | Convert a vector into a diagonal matrix
+-- | Convert a vector into a diagonal matrix.
 diag :: (KnownNat n) => R n -> LinearMap n n
 diag r = LinearMap f f
   where
