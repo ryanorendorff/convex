@@ -32,6 +32,23 @@ jupyter-notebook
   will require GHC 8.12 at the earliest.
 
 
+## Comparison with Agda
+
+A comparison for this implementation with a dependently typed language (Agda)
+is provided in `agda-comparison`. Some functions that can be typed in Agda that
+do not yet have their implementation in Haskell are provided in order to
+determine what might be needed to implement the given function. Below is a list of functions that currently have 
+
+- `splitToVectorList : {A : Set} → (ns : List ℕ) → Vec A (sum ns) → VectorList A ns`
+
+   This seems to be difficult to create in Haskell because the splitting
+   operation is done on the type level list of natural numbers (`ns`).
+   Potentially a solution would be to reflect this list to the value level
+   using `Proxy`, and then providing the correct `Proxy` (specifically the one
+   that represents `ns` in `(_ ∷ᴸ ns)`) can be provided back to the recursive
+   call.
+
+
 ## Abstract from LambdaConf 2019 talk
 
 How does a drone remain stable in a chaotic flying environment? By convex
