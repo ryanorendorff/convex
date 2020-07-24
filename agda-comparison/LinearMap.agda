@@ -18,20 +18,6 @@ variable
   A : Set
   a b c : A
 
--- We could make the natural numbers implicit but then they do not
--- appear in the type signature directly and would have to be made explicit
--- constantly.
-data LinearMap (A : Set) (m n : ℕ) : Set where
-    LM : (Vec A n → Vec A m) -- Forward function
-      → (Vec A m → Vec A n) -- Adjoint function
-      → LinearMap A m n
-
-_ᵀ : ∀ {A : Set} → LinearMap A m n → LinearMap A n m
-LM f a ᵀ = LM a f
-
-_·_ : ∀ {A : Set} → LinearMap A m n → Vec A n → Vec A m
-LM f a · x = f x
-
 record Field (A : Set) : Set where
 
   infixl 7 _+_
@@ -48,27 +34,63 @@ record Field (A : Set) : Set where
     -_   : A → A -- + inverse
     _⁻¹  : A → A -- * inverse
 
-    +-assoc   : a + (b + c) ≡ (a + b) + c
-    +-comm    : a + b ≡ b + a
-    +-0       : a + zero ≡ a
-    +-inv     : - a + a ≡ zero
-    *-assoc   : a * (b * c) ≡ (a * b) * c
-    *-comm    : a * b ≡ b * a
-    *-1       : a * one ≡ a
-    *-inv     : a ⁻¹ * a ≡ one
-    *-distr-+ : a * (b + c) ≡ a * b + a * c
+    +-assoc   : (a b c : A) → a + (b + c) ≡ (a + b) + c
+    +-comm    : (a b : A)   → a + b ≡ b + a
+    +-0       : (a : A)     → a + zero ≡ a
+    +-inv     : (a : A)     → - a + a ≡ zero
+    *-assoc   : (a b c : A) → a * (b * c) ≡ (a * b) * c
+    *-comm    : (a b : A)   → a * b ≡ b * a
+    *-1       : (a : A)     → a * one ≡ a
+    *-inv     : (a : A)     → a ⁻¹ * a ≡ one
+    *-distr-+ : (a b c : A) → a * (b + c) ≡ a * b + a * c
+
 
 _+ⱽ_ : {A : Set} → {f : Field A} → {n : ℕ} → Vec A n → Vec A n → Vec A n
 _+ⱽ_ []ⱽ []ⱽ = []ⱽ
-_+ⱽ_ {A} {f} (x₁ ∷ⱽ xs₁) (x₂ ∷ⱽ xs₂) = (f Field.+ x₁) x₂ ∷ⱽ ((_+ⱽ_ {A} {f}) xs₁ xs₂)
+_+ⱽ_ {A} {f} (x₁ ∷ⱽ xs₁) (x₂ ∷ⱽ xs₂) = x₁ + x₂ ∷ⱽ ((_+ⱽ_ {A} {f}) xs₁ xs₂)
+  where open Field f
 
 infix 7 _+ⱽ_
 
 
--- This is terrible; I must be doing something wrong
+-------------------------------------------------------------------------------
+--                             Proofs on Vectors                             --
+-------------------------------------------------------------------------------
+
++ⱽ-comm : {A : Set} → {f : Field A} → {n : ℕ} → (v₁ v₂ : Vec A n) →
+          (_+ⱽ_ {A} {f}) v₁ v₂ ≡ (_+ⱽ_ {A} {f}) v₂ v₁
++ⱽ-comm []ⱽ []ⱽ = refl
++ⱽ-comm {A} {f} (x₁ ∷ⱽ vs₁) (x₂ ∷ⱽ vs₂) = begin
+  x₁ + x₂ ∷ⱽ vs₁ +ⱽ vs₂
+  ≡⟨ cong ((x₁ + x₂) ∷ⱽ_) (+ⱽ-comm {A} {f} vs₁ vs₂) ⟩
+  x₁ + x₂ ∷ⱽ vs₂ +ⱽ vs₁
+  ≡⟨ cong (_∷ⱽ (_+ⱽ_ {A} {f} vs₂ vs₁)) (+-comm x₁ x₂) ⟩
+  x₂ + x₁ ∷ⱽ vs₂ +ⱽ vs₁
+  ∎
+  where open Field f
+
+
+-------------------------------------------------------------------------------
+--                     LinearMap constructors and values                     --
+-------------------------------------------------------------------------------
+
+data LinearMap (A : Set) (m n : ℕ) : Set where
+    LM : (Vec A n → Vec A m) -- Forward function
+      → (Vec A m → Vec A n) -- Adjoint function
+      → LinearMap A m n
+
+_ᵀ : ∀ {A : Set} → LinearMap A m n → LinearMap A n m
+LM f a ᵀ = LM a f
+
+_·_ : ∀ {A : Set} → LinearMap A m n → Vec A n → Vec A m
+LM f a · x = f x
+
+
 _+_ : {A : Set} → {f : Field A} → {m n : ℕ} →
       LinearMap A m n → LinearMap A m n → LinearMap A m n
-_+_ {A} {f} M₁ M₂ = LM (λ v → (_+ⱽ_ {A} {f}) (M₁ · v) (M₂ · v)) (λ v → (_+ⱽ_ {A} {f}) (M₁ ᵀ · v) (M₂ ᵀ · v) )
+_+_ {A} {f} M₁ M₂ = LM (λ v → M₁ · v +ᶠ M₂ · v) (λ v → M₁ ᵀ · v +ᶠ M₂ ᵀ · v)
+  where _+ᶠ_ = _+ⱽ_ {A} {f}
+        infix 6 _+ᶠ_
 
 _*_ : LinearMap A m n → LinearMap A n p → LinearMap A m p
 _*_ M₁ M₂ = LM (λ v → M₁ · M₂ · v) (λ v → M₂ ᵀ · M₁ ᵀ · v)
