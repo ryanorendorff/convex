@@ -99,7 +99,7 @@ infixr 8 _·_
 infixl 9 _ᵀ
 
 
--- Some matrix free operators. It may be hard to define the ones that need
--- real numbers.
+-- Matrix Free Operators ------------------------------------------------------
+
 idₗₘ : ∀ {A : Set} → LinearMap A n n
 idₗₘ = LM id id
