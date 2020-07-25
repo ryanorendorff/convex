@@ -103,3 +103,22 @@ infixl 9 _ᵀ
 
 idₗₘ : ∀ {A : Set} → LinearMap A n n
 idₗₘ = LM id id
+
+
+-------------------------------------------------------------------------------
+--                            Proofs on LinearMaps                           --
+-------------------------------------------------------------------------------
+
+idᵀᵀ : (B : LinearMap A m n) → B ᵀ ᵀ ≡ B
+idᵀᵀ (LM f a) = refl
+
+
+ᵀ-distr-* : (L : LinearMap A m n) (R : LinearMap A n p)
+          → (L * R) ᵀ ≡ (R ᵀ * L ᵀ)
+ᵀ-distr-* L R rewrite idᵀᵀ L | idᵀᵀ R = refl
+
+
+ᵀ-distr-+ : {A : Set} ⦃ f : Field A ⦄
+          → (L : LinearMap A m n) (R : LinearMap A m n)
+          → (L + R) ᵀ ≡ (L ᵀ + R ᵀ)
+ᵀ-distr-+ L R rewrite idᵀᵀ L | idᵀᵀ R = refl
