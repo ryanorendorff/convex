@@ -74,23 +74,25 @@ infix 7 _+ⱽ_
 -------------------------------------------------------------------------------
 
 data M_∶_×_ (A : Set) (m n : ℕ) : Set where
-    LM : (Vec A n → Vec A m) -- Forward function
-      → (Vec A m → Vec A n) -- Adjoint function
-      → M A ∶ m × n
+  ⟦_,_⟧ : (Vec A n → Vec A m) -- Forward function
+        → (Vec A m → Vec A n) -- Adjoint function
+        → M A ∶ m × n
 
 _ᵀ : ∀ {A : Set} → M A ∶ m × n → M A ∶ n × m
-LM f a ᵀ = LM a f
+⟦ f , a ⟧ ᵀ = ⟦ a , f ⟧
 
 _·_ : ∀ {A : Set} → M A ∶ m × n → Vec A n → Vec A m
-LM f a · x = f x
+⟦ f , a ⟧ · x = f x
 
 _+_ : {A : Set} ⦃ f : Field A ⦄ → {m n : ℕ} →
       M A ∶ m × n → M A ∶ m × n → M A ∶ m × n
-M₁ + M₂ = LM (λ v → M₁ · v +ⱽ M₂ · v) (λ v → M₁ ᵀ · v +ⱽ M₂ ᵀ · v)
+M₁ + M₂ = ⟦ (λ v → M₁ · v +ⱽ M₂ · v)
+          , (λ v → M₁ ᵀ · v +ⱽ M₂ ᵀ · v) ⟧
   where open Field {{...}}
 
 _*_ : M A ∶ m × n → M A ∶ n × p → M A ∶ m × p
-M₁ * M₂ = LM (λ v → M₁ · M₂ · v) (λ v → M₂ ᵀ · M₁ ᵀ · v)
+M₁ * M₂ = ⟦ (λ v → M₁ · M₂ · v)
+          , (λ v → M₂ ᵀ · M₁ ᵀ · v) ⟧
 
 
 infix 7 _+_
@@ -102,7 +104,7 @@ infixl 9 _ᵀ
 -- Matrix Free Operators ------------------------------------------------------
 
 I : M A ∶ n × n
-I = LM id id
+I = ⟦ id , id ⟧
 
 
 -------------------------------------------------------------------------------
@@ -110,7 +112,7 @@ I = LM id id
 -------------------------------------------------------------------------------
 
 idᵀᵀ : (B : M A ∶ m × n) → B ᵀ ᵀ ≡ B
-idᵀᵀ (LM f a) = refl
+idᵀᵀ ⟦ _ , _ ⟧ = refl
 
 
 ᵀ-distr-* : (L : M A ∶ m × n) (R : M A ∶ n × p)
