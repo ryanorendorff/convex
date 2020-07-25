@@ -73,23 +73,23 @@ infix 7 _+ⱽ_
 --                     LinearMap constructors and values                     --
 -------------------------------------------------------------------------------
 
-data LinearMap (A : Set) (m n : ℕ) : Set where
+data M_∶_×_ (A : Set) (m n : ℕ) : Set where
     LM : (Vec A n → Vec A m) -- Forward function
       → (Vec A m → Vec A n) -- Adjoint function
-      → LinearMap A m n
+      → M A ∶ m × n
 
-_ᵀ : ∀ {A : Set} → LinearMap A m n → LinearMap A n m
+_ᵀ : ∀ {A : Set} → M A ∶ m × n → M A ∶ n × m
 LM f a ᵀ = LM a f
 
-_·_ : ∀ {A : Set} → LinearMap A m n → Vec A n → Vec A m
+_·_ : ∀ {A : Set} → M A ∶ m × n → Vec A n → Vec A m
 LM f a · x = f x
 
 _+_ : {A : Set} ⦃ f : Field A ⦄ → {m n : ℕ} →
-      LinearMap A m n → LinearMap A m n → LinearMap A m n
+      M A ∶ m × n → M A ∶ m × n → M A ∶ m × n
 M₁ + M₂ = LM (λ v → M₁ · v +ⱽ M₂ · v) (λ v → M₁ ᵀ · v +ⱽ M₂ ᵀ · v)
   where open Field {{...}}
 
-_*_ : LinearMap A m n → LinearMap A n p → LinearMap A m p
+_*_ : M A ∶ m × n → M A ∶ n × p → M A ∶ m × p
 M₁ * M₂ = LM (λ v → M₁ · M₂ · v) (λ v → M₂ ᵀ · M₁ ᵀ · v)
 
 
@@ -101,24 +101,28 @@ infixl 9 _ᵀ
 
 -- Matrix Free Operators ------------------------------------------------------
 
-idₗₘ : ∀ {A : Set} → LinearMap A n n
-idₗₘ = LM id id
+I : M A ∶ n × n
+I = LM id id
 
 
 -------------------------------------------------------------------------------
 --                            Proofs on LinearMaps                           --
 -------------------------------------------------------------------------------
 
-idᵀᵀ : (B : LinearMap A m n) → B ᵀ ᵀ ≡ B
+idᵀᵀ : (B : M A ∶ m × n) → B ᵀ ᵀ ≡ B
 idᵀᵀ (LM f a) = refl
 
 
-ᵀ-distr-* : (L : LinearMap A m n) (R : LinearMap A n p)
+ᵀ-distr-* : (L : M A ∶ m × n) (R : M A ∶ n × p)
           → (L * R) ᵀ ≡ (R ᵀ * L ᵀ)
 ᵀ-distr-* L R rewrite idᵀᵀ L | idᵀᵀ R = refl
 
 
 ᵀ-distr-+ : {A : Set} ⦃ f : Field A ⦄
-          → (L : LinearMap A m n) (R : LinearMap A m n)
+          → (L : M A ∶ m × n) (R : M A ∶ m × n)
           → (L + R) ᵀ ≡ (L ᵀ + R ᵀ)
 ᵀ-distr-+ L R rewrite idᵀᵀ L | idᵀᵀ R = refl
+
+
+I-idempotent : {A : Set} {n : ℕ} → (I {A} {n}) * I ≡ I
+I-idempotent = refl
