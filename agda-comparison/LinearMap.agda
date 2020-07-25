@@ -18,7 +18,7 @@ variable
   A : Set
   a b c : A
 
-record Field (A : Set) : Set where
+record Field {ℓ} (A : Set ℓ) : Set ℓ where
 
   infixl 7 _+_
   infixl 8 _*_
@@ -45,10 +45,10 @@ record Field (A : Set) : Set where
     *-distr-+ : (a b c : A) → a * (b + c) ≡ a * b + a * c
 
 
-_+ⱽ_ : {A : Set} → {f : Field A} → {n : ℕ} → Vec A n → Vec A n → Vec A n
+_+ⱽ_ : ⦃ f : Field A ⦄ → Vec A n → Vec A n → Vec A n
 _+ⱽ_ []ⱽ []ⱽ = []ⱽ
-_+ⱽ_ {A} {f} (x₁ ∷ⱽ xs₁) (x₂ ∷ⱽ xs₂) = x₁ + x₂ ∷ⱽ ((_+ⱽ_ {A} {f}) xs₁ xs₂)
-  where open Field f
+_+ⱽ_ (x₁ ∷ⱽ xs₁) (x₂ ∷ⱽ xs₂) = x₁ + x₂ ∷ⱽ (xs₁ +ⱽ xs₂)
+  where open Field {{...}}
 
 infix 7 _+ⱽ_
 
@@ -57,17 +57,16 @@ infix 7 _+ⱽ_
 --                             Proofs on Vectors                             --
 -------------------------------------------------------------------------------
 
-+ⱽ-comm : {A : Set} → {f : Field A} → {n : ℕ} → (v₁ v₂ : Vec A n) →
-          (_+ⱽ_ {A} {f}) v₁ v₂ ≡ (_+ⱽ_ {A} {f}) v₂ v₁
++ⱽ-comm : ⦃ f : Field A ⦄ → (v₁ v₂ : Vec A n) → v₁ +ⱽ v₂ ≡ v₂ +ⱽ v₁
 +ⱽ-comm []ⱽ []ⱽ = refl
-+ⱽ-comm {A} {f} (x₁ ∷ⱽ vs₁) (x₂ ∷ⱽ vs₂) = begin
++ⱽ-comm (x₁ ∷ⱽ vs₁) (x₂ ∷ⱽ vs₂) = begin
   x₁ + x₂ ∷ⱽ vs₁ +ⱽ vs₂
-  ≡⟨ cong ((x₁ + x₂) ∷ⱽ_) (+ⱽ-comm {A} {f} vs₁ vs₂) ⟩
+  ≡⟨ cong ((x₁ + x₂) ∷ⱽ_) (+ⱽ-comm vs₁ vs₂) ⟩
   x₁ + x₂ ∷ⱽ vs₂ +ⱽ vs₁
-  ≡⟨ cong (_∷ⱽ (_+ⱽ_ {A} {f} vs₂ vs₁)) (+-comm x₁ x₂) ⟩
+  ≡⟨ cong (_∷ⱽ vs₂ +ⱽ vs₁) (+-comm x₁ x₂) ⟩
   x₂ + x₁ ∷ⱽ vs₂ +ⱽ vs₁
   ∎
-  where open Field f
+  where open Field {{...}}
 
 
 -------------------------------------------------------------------------------
@@ -85,15 +84,14 @@ LM f a ᵀ = LM a f
 _·_ : ∀ {A : Set} → LinearMap A m n → Vec A n → Vec A m
 LM f a · x = f x
 
-
-_+_ : {A : Set} → {f : Field A} → {m n : ℕ} →
+_+_ : {A : Set} ⦃ f : Field A ⦄ → {m n : ℕ} →
       LinearMap A m n → LinearMap A m n → LinearMap A m n
-_+_ {A} {f} M₁ M₂ = LM (λ v → M₁ · v +ᶠ M₂ · v) (λ v → M₁ ᵀ · v +ᶠ M₂ ᵀ · v)
-  where _+ᶠ_ = _+ⱽ_ {A} {f}
-        infix 6 _+ᶠ_
+M₁ + M₂ = LM (λ v → M₁ · v +ⱽ M₂ · v) (λ v → M₁ ᵀ · v +ⱽ M₂ ᵀ · v)
+  where open Field {{...}}
 
 _*_ : LinearMap A m n → LinearMap A n p → LinearMap A m p
-_*_ M₁ M₂ = LM (λ v → M₁ · M₂ · v) (λ v → M₂ ᵀ · M₁ ᵀ · v)
+M₁ * M₂ = LM (λ v → M₁ · M₂ · v) (λ v → M₂ ᵀ · M₁ ᵀ · v)
+
 
 infix 7 _+_
 infix 8 _*_
