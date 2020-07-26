@@ -98,6 +98,20 @@ zipWith-comm f f-comm (x ∷ⱽ xs) (y ∷ⱽ ys) rewrite
 --                     LinearMap constructors and values                     --
 -------------------------------------------------------------------------------
 
+-- This data type is incomplete. We need to add the following
+--
+-- 1. Define the forward and adjoint functions to be linear maps, as in they
+--    respect the following properties:
+--
+--    a. Additivity : f (u + v) ≡ f u + f v ∀ u, v ∈ V(F)
+--    b. homogeneity : ∀ c ∈ F, f (c * u) ≡ c * f u, u ∈ V(F)
+--
+-- 2. We want the transpose operation to actually be the transpose. This is to
+--    say that we want the following equation to hold.
+--
+--    ⟨ x ᵀ, A * y ⟩ ≡ ⟨ yᵀ * , A ᵀ * x ⟩
+--
+--    This equation is just the transpose rule: (xᵀAy)ᵀ ≡ (yᵀAᵀx)
 data M_∶_×_ (A : Set) (m n : ℕ) : Set where
   ⟦_,_⟧ : (Vec A n → Vec A m) -- Forward function
         → (Vec A m → Vec A n) -- Adjoint function
@@ -150,3 +164,9 @@ idᵀᵀ ⟦ _ , _ ⟧ = refl
 
 I-idempotent : {A : Set} {n : ℕ} → (I {A} {n}) * I ≡ I
 I-idempotent = refl
+
+-- This is the start of a redefinition for M; see above
+id-transpose : ⦃ F : Field A ⦄ → (x y : Vec A n) → ⟨ x , id y ⟩ ≡ ⟨ y , id x ⟩
+id-transpose {{F}} x y rewrite
+    zipWith-comm (Field._*_ F) (Field.*-comm F) x y
+  = refl
