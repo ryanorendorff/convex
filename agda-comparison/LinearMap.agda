@@ -42,12 +42,25 @@ record Field {ℓ} (A : Set ℓ) : Set ℓ where
     *-distr-+ : (a b c : A) → a * (b + c) ≡ a * b + a * c
 
 
-_+ⱽ_ : ⦃ f : Field A ⦄ → Vec A n → Vec A n → Vec A n
+_+ⱽ_ : ⦃ F : Field A ⦄ → Vec A n → Vec A n → Vec A n
 _+ⱽ_ []ⱽ []ⱽ = []ⱽ
 _+ⱽ_ (x₁ ∷ⱽ xs₁) (x₂ ∷ⱽ xs₂) = x₁ + x₂ ∷ⱽ (xs₁ +ⱽ xs₂)
   where open Field {{...}}
 
 infix 7 _+ⱽ_
+
+sum : {A : Set} ⦃ F : Field A ⦄ → Vec A n → A
+sum = foldr _ _+_ zero
+  where open Field {{...}}
+
+-- Vector Hadamard product
+_∘ⱽ_ : {A : Set} ⦃ F : Field A ⦄ → Vec A n → Vec A n → Vec A n
+_∘ⱽ_ = zipWith _*_
+  where open Field {{...}}
+
+-- Inner product
+⟨_,_⟩ : {A : Set} ⦃ F : Field A ⦄ → Vec A n → Vec A n → A
+⟨ v₁ , v₂ ⟩ =  sum (v₁ ∘ⱽ v₂)
 
 
 -------------------------------------------------------------------------------
@@ -71,6 +84,14 @@ zipWith-comm f f-comm (x ∷ⱽ xs) (y ∷ⱽ ys) rewrite
   x₂ + x₁ ∷ⱽ vs₂ +ⱽ vs₁
   ∎
   where open Field {{...}}
+
+⟨⟩-comm : ⦃ F : Field A ⦄ → (v₁ v₂ : Vec A n)
+        → ⟨ v₁ , v₂ ⟩ ≡ ⟨ v₂ , v₁ ⟩
+⟨⟩-comm []ⱽ []ⱽ = refl
+⟨⟩-comm {{F}} (x₁ ∷ⱽ v₁) (x₂ ∷ⱽ v₂) rewrite
+    ⟨⟩-comm v₁ v₂
+  | Field.*-comm F x₁ x₂
+  = refl
 
 
 -------------------------------------------------------------------------------
