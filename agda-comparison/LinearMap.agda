@@ -1,13 +1,10 @@
 module LinearMap where
 
-open import Data.List using (List; sum) renaming ([] to []ᴸ; _∷_ to _∷ᴸ_)
 open import Data.Nat using (ℕ)
-open import Data.Vec using (Vec; _++_) renaming ([] to []ⱽ; _∷_ to _∷ⱽ_)
-open import Data.Product as Prod using (∃; ∃₂; _×_; _,_)
+open import Data.Vec using (Vec; foldr; zipWith) renaming ([] to []ⱽ; _∷_ to _∷ⱽ_)
 
 open import Relation.Binary.PropositionalEquality
 open ≡-Reasoning
-
 
 open import Function using (id)
 
@@ -57,7 +54,14 @@ infix 7 _+ⱽ_
 --                             Proofs on Vectors                             --
 -------------------------------------------------------------------------------
 
-+ⱽ-comm : ⦃ f : Field A ⦄ → (v₁ v₂ : Vec A n) → v₁ +ⱽ v₂ ≡ v₂ +ⱽ v₁
+zipWith-comm : (f : A → A → A) → (f-comm : (a b : A) → f a b ≡ f b a)
+             → (x y : Vec A n) → zipWith f x y ≡ zipWith f y x
+zipWith-comm f f-comm []ⱽ []ⱽ = refl
+zipWith-comm f f-comm (x ∷ⱽ xs) (y ∷ⱽ ys) rewrite
+    zipWith-comm f f-comm xs ys
+  | f-comm x y = refl
+
++ⱽ-comm : ⦃ F : Field A ⦄ → (v₁ v₂ : Vec A n) → v₁ +ⱽ v₂ ≡ v₂ +ⱽ v₁
 +ⱽ-comm []ⱽ []ⱽ = refl
 +ⱽ-comm (x₁ ∷ⱽ vs₁) (x₂ ∷ⱽ vs₂) = begin
   x₁ + x₂ ∷ⱽ vs₁ +ⱽ vs₂
