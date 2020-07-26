@@ -109,7 +109,7 @@ _ᵀ : ∀ {A : Set} → M A ∶ m × n → M A ∶ n × m
 _·_ : ∀ {A : Set} → M A ∶ m × n → Vec A n → Vec A m
 ⟦ f , a ⟧ · x = f x
 
-_+_ : {A : Set} ⦃ f : Field A ⦄ → {m n : ℕ} →
+_+_ : {A : Set} ⦃ F : Field A ⦄ → {m n : ℕ} →
       M A ∶ m × n → M A ∶ m × n → M A ∶ m × n
 M₁ + M₂ = ⟦ (λ v → M₁ · v +ⱽ M₂ · v)
           , (λ v → M₁ ᵀ · v +ⱽ M₂ ᵀ · v) ⟧
@@ -139,17 +139,14 @@ I = ⟦ id , id ⟧
 idᵀᵀ : (B : M A ∶ m × n) → B ᵀ ᵀ ≡ B
 idᵀᵀ ⟦ _ , _ ⟧ = refl
 
-
 ᵀ-distr-* : (L : M A ∶ m × n) (R : M A ∶ n × p)
           → (L * R) ᵀ ≡ (R ᵀ * L ᵀ)
 ᵀ-distr-* L R rewrite idᵀᵀ L | idᵀᵀ R = refl
 
-
-ᵀ-distr-+ : {A : Set} ⦃ f : Field A ⦄
+ᵀ-distr-+ : {A : Set} ⦃ F : Field A ⦄
           → (L : M A ∶ m × n) (R : M A ∶ m × n)
           → (L + R) ᵀ ≡ (L ᵀ + R ᵀ)
 ᵀ-distr-+ L R rewrite idᵀᵀ L | idᵀᵀ R = refl
-
 
 I-idempotent : {A : Set} {n : ℕ} → (I {A} {n}) * I ≡ I
 I-idempotent = refl
