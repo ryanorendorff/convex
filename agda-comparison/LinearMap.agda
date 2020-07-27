@@ -93,9 +93,19 @@ zipWith-comm f f-comm (x ∷ⱽ xs) (y ∷ⱽ ys) rewrite
   | Field.*-comm F x₁ x₂
   = refl
 
+-------------------------------------------------------------------------------
+--                           LinearMap constructor                           --
+-------------------------------------------------------------------------------
+
+data LinearMap (A : Set) ⦃ F : Field A ⦄ (m n : ℕ) : Set where
+  LM : (g : Vec A m → Vec A n)
+     → ((u v : Vec A m) → g (u +ⱽ v) ≡ g u +ⱽ g v)
+     → ((c : A) → (v : Vec A m) → g ((Field._*_ F) c v) ≡ (Field._*_ F) c (g v))
+     → LinearMap A g m n
+
 
 -------------------------------------------------------------------------------
---                     LinearMap constructors and values                     --
+--                          M constructor and values                         --
 -------------------------------------------------------------------------------
 
 -- This data type is incomplete. We need to add the following
@@ -104,7 +114,7 @@ zipWith-comm f f-comm (x ∷ⱽ xs) (y ∷ⱽ ys) rewrite
 --    respect the following properties:
 --
 --    a. Additivity : f (u + v) ≡ f u + f v ∀ u, v ∈ V(F)
---    b. homogeneity : ∀ c ∈ F, f (c * u) ≡ c * f u, u ∈ V(F)
+--    b. Homogeneity : ∀ c ∈ F, f (c * u) ≡ c * f u, u ∈ V(F)
 --
 -- 2. We want the transpose operation to actually be the transpose. This is to
 --    say that we want the following equation to hold.
