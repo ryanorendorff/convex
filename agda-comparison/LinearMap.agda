@@ -61,7 +61,7 @@ c *ᶜ v = map (c *_) v
 
 infixl  7 _+ⱽ_
 infixl  8 _∘ⱽ_
-infixl 10 _*ˢ_
+infixl 10 _*ᶜ_
 
 
 sum : {A : Set} ⦃ F : Field A ⦄ → Vec A n → A
@@ -107,11 +107,32 @@ zipWith-comm f f-comm (x ∷ⱽ xs) (y ∷ⱽ ys) rewrite
 --                           LinearMap constructor                           --
 -------------------------------------------------------------------------------
 
-data LinearMap (A : Set) ⦃ F : Field A ⦄ (m n : ℕ) : Set where
-  LM : (g : Vec A m → Vec A n)
-     → ((u v : Vec A m) → g (u +ⱽ v) ≡ g u +ⱽ g v)
-     → ((c : A) → (v : Vec A m) → g (c *ᶜ v) ≡ c *ᶜ (g v))
-     → LinearMap A m n
+record LinearMap (A : Set) ⦃ F : Field A ⦄ (m n : ℕ) : Set where
+  field
+    f : (Vec A m → Vec A n)
+
+    -- Additivity
+    f[u+v]≡f[u]+f[v] : (u v : Vec A m) → f (u +ⱽ v) ≡ f u +ⱽ f v
+
+    -- Homogeneity
+    f[c*v]≡c*f[v] : (c : A) → (v : Vec A m) → f (c *ᶜ v) ≡ c *ᶜ (f v)
+
+
+_∙ₗₘ_ : {A : Set} ⦃ F : Field A ⦄ → LinearMap A m n → Vec A m → Vec A n
+_∙ₗₘ_ LM v = LinearMap.f LM v
+
+-- Choose 20 since function application is assumed higher than almost anything
+infixr 20 _∙ₗₘ_
+
+
+-- Example LinearMap values ---------------------------------------------------
+
+idₗₘ : ∀ {A n} ⦃ f : Field A ⦄ → LinearMap A n n
+idₗₘ = record
+  { f = id
+  ; f[u+v]≡f[u]+f[v] = λ u v → refl
+  ; f[c*v]≡c*f[v] = λ c v → refl
+  }
 
 
 -------------------------------------------------------------------------------
