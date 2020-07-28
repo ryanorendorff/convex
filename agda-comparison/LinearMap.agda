@@ -177,8 +177,8 @@ M₁ * M₂ = ⟦ (λ v → M₁ · M₂ · v)
 
 infix 7 _+_
 infix 8 _*_
-infixr 8 _·_
-infixl 9 _ᵀ
+infixr 20 _·_
+infixl 25 _ᵀ
 
 
 -- Matrix Free Operators ------------------------------------------------------
