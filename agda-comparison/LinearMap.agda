@@ -1,7 +1,7 @@
 module LinearMap where
 
 open import Data.Nat using (ℕ)
-open import Data.Vec using (Vec; foldr; zipWith) renaming ([] to []ⱽ; _∷_ to _∷ⱽ_)
+open import Data.Vec using (Vec; foldr; zipWith; map) renaming ([] to []ⱽ; _∷_ to _∷ⱽ_)
 
 open import Relation.Binary.PropositionalEquality
 open ≡-Reasoning
@@ -42,20 +42,30 @@ record Field {ℓ} (A : Set ℓ) : Set ℓ where
     *-distr-+ : (a b c : A) → a * (b + c) ≡ a * b + a * c
 
 
+-- Binary operators on vectors ------------------------------------------------
+
 _+ⱽ_ : ⦃ F : Field A ⦄ → Vec A n → Vec A n → Vec A n
 _+ⱽ_ []ⱽ []ⱽ = []ⱽ
 _+ⱽ_ (x₁ ∷ⱽ xs₁) (x₂ ∷ⱽ xs₂) = x₁ + x₂ ∷ⱽ (xs₁ +ⱽ xs₂)
   where open Field {{...}}
 
-infix 7 _+ⱽ_
-
-sum : {A : Set} ⦃ F : Field A ⦄ → Vec A n → A
-sum = foldr _ _+_ zero
-  where open Field {{...}}
-
 -- Vector Hadamard product
 _∘ⱽ_ : {A : Set} ⦃ F : Field A ⦄ → Vec A n → Vec A n → Vec A n
 _∘ⱽ_ = zipWith _*_
+  where open Field {{...}}
+
+-- Multiply vector by a constant
+_*ᶜ_ : {A : Set} ⦃ F : Field A ⦄ → A → Vec A n → Vec A n
+c *ᶜ v = map (c *_) v
+  where open Field {{...}}
+
+infixl  7 _+ⱽ_
+infixl  8 _∘ⱽ_
+infixl 10 _*ˢ_
+
+
+sum : {A : Set} ⦃ F : Field A ⦄ → Vec A n → A
+sum = foldr _ _+_ zero
   where open Field {{...}}
 
 -- Inner product
@@ -100,8 +110,8 @@ zipWith-comm f f-comm (x ∷ⱽ xs) (y ∷ⱽ ys) rewrite
 data LinearMap (A : Set) ⦃ F : Field A ⦄ (m n : ℕ) : Set where
   LM : (g : Vec A m → Vec A n)
      → ((u v : Vec A m) → g (u +ⱽ v) ≡ g u +ⱽ g v)
-     → ((c : A) → (v : Vec A m) → g ((Field._*_ F) c v) ≡ (Field._*_ F) c (g v))
-     → LinearMap A g m n
+     → ((c : A) → (v : Vec A m) → g (c *ᶜ v) ≡ c *ᶜ (g v))
+     → LinearMap A m n
 
 
 -------------------------------------------------------------------------------
