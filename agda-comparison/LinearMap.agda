@@ -132,10 +132,29 @@ zipWith-comm f f-comm (x ∷ⱽ xs) (y ∷ⱽ ys) rewrite
   ∎
   where open Field {{...}}
 
+∘ⱽ-distr-+ⱽ : ∀ {A n} ⦃ F : Field A ⦄ → (a u v : Vec A n)
+            → a ∘ⱽ (u +ⱽ v) ≡ a ∘ⱽ u +ⱽ a ∘ⱽ v
+∘ⱽ-distr-+ⱽ []ⱽ []ⱽ []ⱽ = refl
+∘ⱽ-distr-+ⱽ ⦃ F ⦄ (a ∷ⱽ as) (u ∷ⱽ us) (v ∷ⱽ vs) rewrite
+    ∘ⱽ-distr-+ⱽ as us vs
+  | Field.*-distr-+ F a u v
+  = refl
+
+-- Homogeneity of degree 1 for linear maps
+∘ⱽ*ᶜ≡*ᶜ∘ⱽ : ∀ {A n} ⦃ F : Field A ⦄ → (c : A) (u v : Vec A n)
+          → u ∘ⱽ c *ᶜ v ≡ c *ᶜ (u ∘ⱽ v)
+∘ⱽ*ᶜ≡*ᶜ∘ⱽ c []ⱽ []ⱽ = refl
+∘ⱽ*ᶜ≡*ᶜ∘ⱽ ⦃ F ⦄ c (u ∷ⱽ us) (v ∷ⱽ vs) rewrite
+    ∘ⱽ*ᶜ≡*ᶜ∘ⱽ c us vs
+  | Field.*-assoc F u c v
+  | Field.*-comm F u c
+  | sym (Field.*-assoc F c u v)
+  = refl
+
 ⟨⟩-comm : ⦃ F : Field A ⦄ → (v₁ v₂ : Vec A n)
         → ⟨ v₁ , v₂ ⟩ ≡ ⟨ v₂ , v₁ ⟩
 ⟨⟩-comm []ⱽ []ⱽ = refl
-⟨⟩-comm {{F}} (x₁ ∷ⱽ v₁) (x₂ ∷ⱽ v₂) rewrite
+⟨⟩-comm ⦃ F ⦄ (x₁ ∷ⱽ v₁) (x₂ ∷ⱽ v₂) rewrite
     ⟨⟩-comm v₁ v₂
   | Field.*-comm F x₁ x₂
   = refl
@@ -171,6 +190,12 @@ idₗₘ = record
   ; f[c*v]≡c*f[v] = λ c v → refl
   }
 
+diagₗₘ : ∀ {A n} ⦃ f : Field A ⦄ → Vec A n → LinearMap A n n
+diagₗₘ d = record
+  { f = d ∘ⱽ_
+  ; f[u+v]≡f[u]+f[v] = ∘ⱽ-distr-+ⱽ d
+  ; f[c*v]≡c*f[v] = λ c v → ∘ⱽ*ᶜ≡*ᶜ∘ⱽ c d v
+  }
 
 -------------------------------------------------------------------------------
 --                          M constructor and values                         --
