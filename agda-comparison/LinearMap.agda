@@ -234,75 +234,88 @@ diagₗₘ d = record
 --                          M constructor and values                         --
 -------------------------------------------------------------------------------
 
--- This data type is incomplete. We need to add the following
---
--- 1. Define the forward and adjoint functions to be linear maps, as in they
---    respect the following properties:
---
---    a. Additivity : f (u + v) ≡ f u + f v ∀ u, v ∈ V(F)
---    b. Homogeneity : ∀ c ∈ F, f (c * u) ≡ c * f u, u ∈ V(F)
---
--- 2. We want the transpose operation to actually be the transpose. This is to
---    say that we want the following equation to hold.
---
---    ⟨ x ᵀ, A * y ⟩ ≡ ⟨ yᵀ * , A ᵀ * x ⟩
---
---    This equation is just the transpose rule: (xᵀAy)ᵀ ≡ (yᵀAᵀx)
-data M_∶_×_ (A : Set) (m n : ℕ) : Set where
-  ⟦_,_⟧ : (Vec A n → Vec A m) -- Forward function
-        → (Vec A m → Vec A n) -- Adjoint function
-        → M A ∶ m × n
-
-_ᵀ : ∀ {A : Set} → M A ∶ m × n → M A ∶ n × m
-⟦ f , a ⟧ ᵀ = ⟦ a , f ⟧
-
-_·_ : ∀ {A : Set} → M A ∶ m × n → Vec A n → Vec A m
-⟦ f , a ⟧ · x = f x
-
-_+_ : {A : Set} ⦃ F : Field A ⦄ → {m n : ℕ} →
-      M A ∶ m × n → M A ∶ m × n → M A ∶ m × n
-M₁ + M₂ = ⟦ (λ v → M₁ · v +ⱽ M₂ · v)
-          , (λ v → M₁ ᵀ · v +ⱽ M₂ ᵀ · v) ⟧
-  where open Field {{...}}
-
-_*_ : M A ∶ m × n → M A ∶ n × p → M A ∶ m × p
-M₁ * M₂ = ⟦ (λ v → M₁ · M₂ · v)
-          , (λ v → M₂ ᵀ · M₁ ᵀ · v) ⟧
+data M_∶_×_ (A : Set) ⦃ F : Field A ⦄ (m n : ℕ) : Set where
+  ⟦_,_,_⟧ : (M : LinearMap A n m )
+          → (Mᵀ : LinearMap A m n )
+          → (p : (x : Vec A m) → (y : Vec A n)
+               → ⟨ x , M ∙ₗₘ y ⟩ ≡ ⟨ y , Mᵀ ∙ₗₘ x ⟩ )
+          → M A ∶ m × n
 
 
-infix 7 _+_
-infix 8 _*_
+_ᵀ : {A : Set} ⦃ F : Field A ⦄ → M A ∶ m × n → M A ∶ n × m
+⟦ f , a , p ⟧ ᵀ = ⟦ a , f , (λ x y → sym (p y x)) ⟧
+
+_·_ : ∀ {A : Set} ⦃ F : Field A ⦄ → M A ∶ m × n → Vec A n → Vec A m
+⟦ f , a , _ ⟧ · x = f ∙ₗₘ x
+
+-- Oh poop, maybe this cannot be proved because we git a case of an empty
+-- list that just gets combined. This problem would not happen if we had a
+-- n1ᶠmpty vector, I think?
+-- ∙-distr-+ⱽ : {A : Set} ⦃ F : Field A ⦄
+--            → (M : M A ∶ m × n) → (u v : Vec A n)
+--            → M · (u +ⱽ v) ≡ M · u +ⱽ M · v
+-- ∙-distr-+ⱽ ⟦ M , Mᵀ , p ⟧ []ⱽ []ⱽ = {!!}
+-- ∙-distr-+ⱽ ⟦ M , Mᵀ , p ⟧ (u ∷ⱽ us) v = {!!}
+
+-- _+_ : {A : Set} ⦃ F : Field A ⦄ → {m n : ℕ} →
+--       M A ∶ m × n → M A ∶ m × n → M A ∶ m × n
+-- M₁ + M₂ = ⟦ record
+--             { f = λ v → M₁ · v +ⱽ M₂ · v
+--             ; f[u+v]≡f[u]+f[v] = λ u v → {!!}
+--             ; f[c*v]≡c*f[v] = {!!}
+--             }
+--           , {!!} -- (λ v → M₁ ᵀ · v +ⱽ M₂ ᵀ · v),
+--           , {!!}
+--           ⟧
+--   where open Field {{...}}
+
+-- Can't do this 1ᶠ either because of the empty list problem.
+-- _*_ : {A : Set} ⦃ F : Field A ⦄ → M A ∶ m × n → M A ∶ n × p → M A ∶ m × p
+-- M₁ * M₂ = ⟦ record
+--             { f = (λ v → M₁ · M₂ · v)
+--             ; f[u+v]≡f[u]+f[v] = λ u v → {!!}
+--             ; f[c*v]≡c*f[v] = {!!}
+--             }
+--           , {!!}
+--           -- (λ v → M₂ ᵀ · M₁ ᵀ · v)
+--           , {!!}
+--           ⟧
+
+
+
+-- infix 7 _+_
+-- infix 8 _*_
 infixr 20 _·_
 infixl 25 _ᵀ
-
-
--- Matrix Free Operators ------------------------------------------------------
-
-I : M A ∶ n × n
-I = ⟦ id , id ⟧
-
-
--------------------------------------------------------------------------------
---                            Proofs on LinearMaps                           --
--------------------------------------------------------------------------------
-
-idᵀᵀ : (B : M A ∶ m × n) → B ᵀ ᵀ ≡ B
-idᵀᵀ ⟦ _ , _ ⟧ = refl
-
-ᵀ-distr-* : (L : M A ∶ m × n) (R : M A ∶ n × p)
-          → (L * R) ᵀ ≡ (R ᵀ * L ᵀ)
-ᵀ-distr-* L R rewrite idᵀᵀ L | idᵀᵀ R = refl
-
-ᵀ-distr-+ : {A : Set} ⦃ F : Field A ⦄
-          → (L : M A ∶ m × n) (R : M A ∶ m × n)
-          → (L + R) ᵀ ≡ (L ᵀ + R ᵀ)
-ᵀ-distr-+ L R rewrite idᵀᵀ L | idᵀᵀ R = refl
-
-I-idempotent : {A : Set} {n : ℕ} → (I {A} {n}) * I ≡ I
-I-idempotent = refl
-
--- This is the start of a redefinition for M; see above
-id-transpose : ⦃ F : Field A ⦄ → (x y : Vec A n) → ⟨ x , id y ⟩ ≡ ⟨ y , id x ⟩
-id-transpose {{F}} x y rewrite
-    zipWith-comm (Field._*_ F) (Field.*-comm F) x y
-  = refl
+--
+--
+-- -- Matrix Free Operators ------------------------------------------------------
+--
+-- I : M A ∶ n × n
+-- I = ⟦ id , id ⟧
+--
+--
+-- -------------------------------------------------------------------------------
+-- --                            Proofs on LinearMaps                           --
+-- -------------------------------------------------------------------------------
+--
+-- idᵀᵀ : (B : M A ∶ m × n) → B ᵀ ᵀ ≡ B
+-- idᵀᵀ ⟦ _ , _ ⟧ = refl
+--
+-- ᵀ-distr-* : (L : M A ∶ m × n) (R : M A ∶ n × p)
+--           → (L * R) ᵀ ≡ (R ᵀ * L ᵀ)
+-- ᵀ-distr-* L R rewrite idᵀᵀ L | idᵀᵀ R = refl
+--
+-- ᵀ-distr-+ : {A : Set} ⦃ F : Field A ⦄
+--           → (L : M A ∶ m × n) (R : M A ∶ m × n)
+--           → (L + R) ᵀ ≡ (L ᵀ + R ᵀ)
+-- ᵀ-distr-+ L R rewrite idᵀᵀ L | idᵀᵀ R = refl
+--
+-- I-idempotent : {A : Set} {n : ℕ} → (I {A} {n}) * I ≡ I
+-- I-idempotent = refl
+--
+-- -- This is the start of a redefinition for M; see above
+-- id-transpose : ⦃ F : Field A ⦄ → (x y : Vec A n) → ⟨ x , id y ⟩ ≡ ⟨ y , id x ⟩
+-- id-transpose {{F}} x y rewrite
+--     zipWith-comm (Field._*_ F) (Field.*-comm F) x y
+--   = refl
