@@ -10,10 +10,11 @@ open import Function using (id)
 
 open import VectorList using (VectorList; splitToVectorList; []ⱽᴸ; _∷ⱽᴸ_)
 
-variable
-  m n p q : ℕ
-  A : Set
-  a b c : A
+private
+  variable
+    m n p q : ℕ
+    A : Set
+    a b c : A
 
 record Field {ℓ} (A : Set ℓ) : Set ℓ where
 
