@@ -59,19 +59,19 @@ record Field {ℓ} (A : Set ℓ) : Set ℓ where
     _+_ : A → A → A
     _*_ : A → A → A
 
-    zero : A
-    one  : A
+    0ᶠ : A
+    1ᶠ  : A
     -_   : A → A -- + inverse
     _⁻¹  : A → A -- * inverse
 
     +-assoc   : (a b c : A) → a + (b + c) ≡ (a + b) + c
     +-comm    : (a b : A)   → a + b ≡ b + a
-    +-0       : (a : A)     → a + zero ≡ a
-    +-inv     : (a : A)     → - a + a ≡ zero
+    +-0       : (a : A)     → a + 0ᶠ ≡ a
+    +-inv     : (a : A)     → - a + a ≡ 0ᶠ
     *-assoc   : (a b c : A) → a * (b * c) ≡ (a * b) * c
     *-comm    : (a b : A)   → a * b ≡ b * a
-    *-1       : (a : A)     → a * one ≡ a
-    *-inv     : (a : A)     → a ⁻¹ * a ≡ one -- Missing a ≠ 0 in clause
+    *-1       : (a : A)     → a * 1ᶠ ≡ a
+    *-inv     : (a : A)     → a ⁻¹ * a ≡ 1ᶠ -- Missing a ≠ 0 in clause
     *-distr-+ : (a b c : A) → a * (b + c) ≡ a * b + a * c
 
 
@@ -135,7 +135,7 @@ infixl 10 _*ᶜ_
 
 
 sum : {A : Set} ⦃ F : Field A ⦄ → Vec A n → A
-sum = foldr _ _+_ zero
+sum = foldr _ _+_ 0ᶠ
   where open Field {{...}}
 
 -- Inner product
