@@ -1,6 +1,10 @@
 module LinearMap where
 
-open import Data.Nat using (ℕ)
+open import Level using (Level)
+open import Data.Nat using (ℕ; suc; zero)
+
+open import Data.Empty
+
 open import Data.Vec using (Vec; foldr; zipWith; map) renaming ([] to []ⱽ; _∷_ to _∷ⱽ_)
 
 open import Relation.Binary.PropositionalEquality
@@ -15,6 +19,34 @@ private
     m n p q : ℕ
     A : Set
     a b c : A
+    ℓ : Level
+
+
+-- TODO: Can this be replaced with something like the List⁺ definition so that
+-- the proofs from Vec can be transferred? This definition is convenient because
+-- the size is correct (it is not n - 1).
+data Vec⁺ (A : Set ℓ) : ℕ → Set ℓ where
+  [_] : A → Vec⁺ A 1
+  _∷_ : ∀ {n} (x : A) (xs : Vec⁺ A n) → Vec⁺ A (suc n)
+
+-- Want to prove that is it not possible to construct an empty vector
+emptyVecImpossible : {A : Set ℓ} → Vec⁺ A 0 → ⊥
+emptyVecImpossible = λ ()
+
+Vec⁺→Vec : {A : Set ℓ} → Vec⁺ A n → Vec A n
+Vec⁺→Vec [ v ] = v ∷ⱽ []ⱽ
+Vec⁺→Vec (v ∷ vs⁺) = v ∷ⱽ Vec⁺→Vec vs⁺
+
+Vec⁺→n≢0 : {A : Set ℓ} → Vec⁺ A n → n ≢ 0
+Vec⁺→n≢0 {A} {suc n} v = suc≢0
+  where
+    suc≢0 : {n : ℕ} → suc n ≢ 0
+    suc≢0 {zero} ()
+    suc≢0 {suc n} = λ ()
+
+-- Vec→Vec⁺ : ∀ {ℓ} → {A : Set ℓ} {n : ℕ} → (n ≢ 0) → Vec A n → Vec⁺ A n
+-- Vec→Vec⁺ {ℓ} {A} {0} p []ⱽ = {!p !}
+-- Vec→Vec⁺ {ℓ} {A} {suc n} p (x ∷ⱽ x₁) = {!!}
 
 record Field {ℓ} (A : Set ℓ) : Set ℓ where
 
