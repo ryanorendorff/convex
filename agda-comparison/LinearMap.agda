@@ -155,6 +155,14 @@ zipWith-comm f f-comm (x ∷ⱽ xs) (y ∷ⱽ ys) rewrite
     zipWith-comm f f-comm xs ys
   | f-comm x y = refl
 
++ⱽ-assoc : ⦃ F : Field A ⦄ → (v₁ v₂ v₃ : Vec A n)
+         → v₁ +ⱽ v₂ +ⱽ v₃ ≡ v₁ +ⱽ (v₂ +ⱽ v₃)
++ⱽ-assoc []ⱽ []ⱽ []ⱽ = refl
++ⱽ-assoc ⦃ F ⦄ (v₁ ∷ⱽ vs₁) (v₂ ∷ⱽ vs₂) (v₃ ∷ⱽ vs₃) rewrite
+    +ⱽ-assoc vs₁ vs₂ vs₃
+  | Field.+-assoc F v₁ v₂ v₃
+    = refl
+
 +ⱽ-comm : ⦃ F : Field A ⦄ → (v₁ v₂ : Vec A n) → v₁ +ⱽ v₂ ≡ v₂ +ⱽ v₁
 +ⱽ-comm []ⱽ []ⱽ = refl
 +ⱽ-comm (x₁ ∷ⱽ vs₁) (x₂ ∷ⱽ vs₂) = begin
