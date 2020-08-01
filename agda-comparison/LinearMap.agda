@@ -50,8 +50,8 @@ Vec⁺→n≢0 {A} {suc n} v = suc≢0
 
 record Field {ℓ} (A : Set ℓ) : Set ℓ where
 
-  infixl 7 _+_
-  infixl 8 _*_
+  infixl 6 _+_
+  infixl 7 _*_
   infixl 9 -_
   infixl 10 _⁻¹
 
@@ -129,8 +129,9 @@ _*ᶜ_ : {A : Set} ⦃ F : Field A ⦄ → A → Vec A n → Vec A n
 c *ᶜ v = map (c *_) v
   where open Field {{...}}
 
-infixl  7 _+ⱽ_
-infixl  8 _∘ⱽ_
+-- Match the fixity of Haskell
+infixl  6 _+ⱽ_
+infixl  7 _∘ⱽ_
 infixl 10 _*ᶜ_
 
 
@@ -283,8 +284,8 @@ _·_ : ∀ {A : Set} ⦃ F : Field A ⦄ → M A ∶ m × n → Vec A n → Vec 
 
 
 
--- infix 7 _+_
--- infix 8 _*_
+-- infix 6 _+_
+-- infix 7 _*_
 infixr 20 _·_
 infixl 25 _ᵀ
 --
