@@ -289,41 +289,37 @@ data M_∶_×_ (A : Set) ⦃ F : Field A ⦄ (m n : ℕ) : Set where
   ⟦_,_,_⟧ : (M : LinearMap A n m )
           → (Mᵀ : LinearMap A m n )
           → (p : (x : Vec A m) → (y : Vec A n)
-               → ⟨ x , M ∙ₗₘ y ⟩ ≡ ⟨ y , Mᵀ ∙ₗₘ x ⟩ )
+               → ⟨ x , M ·ˡᵐ y ⟩ ≡ ⟨ y , Mᵀ ·ˡᵐ x ⟩ )
           → M A ∶ m × n
 
+extractLinearMap : {A : Set} ⦃ F : Field A ⦄ → M A ∶ m × n → LinearMap A n m
+extractLinearMap ⟦ M , Mᵀ , p ⟧ = M
 
 _ᵀ : {A : Set} ⦃ F : Field A ⦄ → M A ∶ m × n → M A ∶ n × m
 ⟦ f , a , p ⟧ ᵀ = ⟦ a , f , (λ x y → sym (p y x)) ⟧
 
 _·_ : ∀ {A : Set} ⦃ F : Field A ⦄ → M A ∶ m × n → Vec A n → Vec A m
-⟦ f , a , _ ⟧ · x = f ∙ₗₘ x
+⟦ f , a , _ ⟧ · x = f ·ˡᵐ x
 
-∙-distr-+ⱽ : {A : Set} ⦃ F : Field A ⦄
+·-distr-+ⱽ : {A : Set} ⦃ F : Field A ⦄
            → (M : M A ∶ m × n) → (u v : Vec A n)
            → M · (u +ⱽ v) ≡ M · u +ⱽ M · v
-∙-distr-+ⱽ ⟦ M , _ , _ ⟧ u v = LinearMap.f[u+v]≡f[u]+f[v] M u v
+·-distr-+ⱽ ⟦ M , _ , _ ⟧ u v = LinearMap.f[u+v]≡f[u]+f[v] M u v
+
+·-comm-*ᶜ : {A : Set} ⦃ F : Field A ⦄
+          → (M : M A ∶ m × n) → (c : A) (v : Vec A n)
+          → M · (c *ᶜ v) ≡ c *ᶜ (M · v)
+·-comm-*ᶜ ⟦ M , _ , _ ⟧ c v = LinearMap.f[c*v]≡c*f[v] M c v
+
 
 _+_ : {A : Set} ⦃ F : Field A ⦄ → {m n : ℕ} →
       M A ∶ m × n → M A ∶ m × n → M A ∶ m × n
-M₁ + M₂ = ⟦ record
-            { f = λ v → M₁ · v +ⱽ M₂ · v
-            ; f[u+v]≡f[u]+f[v] = {!!}
-            ; f[c*v]≡c*f[v] = {!!}
-            }
-          , {!!} -- (λ v → M₁ ᵀ · v +ⱽ M₂ ᵀ · v),
+M₁ + M₂ = ⟦ (extractLinearMap M₁) +ˡᵐ (extractLinearMap M₂)
+          , (extractLinearMap (M₁ ᵀ)) +ˡᵐ (extractLinearMap (M₂ ᵀ))
           , {!!}
           ⟧
   where open Field {{...}}
-        additivity : {A : Set} ⦃ F : Field A ⦄
-                   → (M₁ M₂ : M A ∶ m × n) → (u v : Vec A n)
-                   → M₁ · (u +ⱽ v) +ⱽ M₂ · (u +ⱽ v) ≡ M₁ · u +ⱽ M₂ · u +ⱽ (M₁ · v +ⱽ M₂ · v)
-        additivity M₁ M₂ u v rewrite
-            ∙-distr-+ⱽ M₁ u v
-          | ∙-distr-+ⱽ M₂ u v
-          = {!!}
 
--- Can't do this 1ᶠ either because of the empty list problem.
 -- _*_ : {A : Set} ⦃ F : Field A ⦄ → M A ∶ m × n → M A ∶ n × p → M A ∶ m × p
 -- M₁ * M₂ = ⟦ record
 --             { f = (λ v → M₁ · M₂ · v)
