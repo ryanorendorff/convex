@@ -333,25 +333,31 @@ M₁ + M₂ = ⟦ (extractLinearMap M₁) +ˡᵐ (extractLinearMap M₂)
 
 
 
--- infix 6 _+_
+infix 6 _+_
 -- infix 7 _*_
 infixr 20 _·_
 infixl 25 _ᵀ
---
---
--- -- Matrix Free Operators ------------------------------------------------------
---
--- I : M A ∶ n × n
--- I = ⟦ id , id ⟧
---
---
--- -------------------------------------------------------------------------------
--- --                            Proofs on LinearMaps                           --
--- -------------------------------------------------------------------------------
---
--- idᵀᵀ : (B : M A ∶ m × n) → B ᵀ ᵀ ≡ B
--- idᵀᵀ ⟦ _ , _ ⟧ = refl
---
+
+
+-- Matrix Free Operators ------------------------------------------------------
+
+I : {A : Set} ⦃ F : Field A ⦄ → M A ∶ n × n
+I = ⟦ idₗₘ , idₗₘ , id-transpose  ⟧
+  where
+    id-transpose : ⦃ F : Field A ⦄ → (x y : Vec A n)
+                 → ⟨ x , id y ⟩ ≡ ⟨ y , id x ⟩
+    id-transpose {{F}} x y rewrite
+        zipWith-comm (Field._*_ F) (Field.*-comm F) x y
+      = refl
+
+
+-------------------------------------------------------------------------------
+--                            Proofs on LinearMaps                           --
+-------------------------------------------------------------------------------
+
+idᵀᵀ : {A : Set} ⦃ F : Field A ⦄ → (B : M A ∶ m × n) → B ᵀ ᵀ ≡ B
+idᵀᵀ ⟦ M , Mᵀ , p ⟧ = {!!}
+
 -- ᵀ-distr-* : (L : M A ∶ m × n) (R : M A ∶ n × p)
 --           → (L * R) ᵀ ≡ (R ᵀ * L ᵀ)
 -- ᵀ-distr-* L R rewrite idᵀᵀ L | idᵀᵀ R = refl
@@ -363,9 +369,3 @@ infixl 25 _ᵀ
 --
 -- I-idempotent : {A : Set} {n : ℕ} → (I {A} {n}) * I ≡ I
 -- I-idempotent = refl
---
--- -- This is the start of a redefinition for M; see above
--- id-transpose : ⦃ F : Field A ⦄ → (x y : Vec A n) → ⟨ x , id y ⟩ ≡ ⟨ y , id x ⟩
--- id-transpose {{F}} x y rewrite
---     zipWith-comm (Field._*_ F) (Field.*-comm F) x y
---   = refl
