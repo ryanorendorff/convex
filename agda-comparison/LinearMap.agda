@@ -226,7 +226,7 @@ record LinearMap (A : Set) ⦃ F : Field A ⦄ (m n : ℕ) : Set where
 
 
 _·ˡᵐ_ : {A : Set} ⦃ F : Field A ⦄ → LinearMap A m n → Vec A m → Vec A n
-_·ˡᵐ_ LM v = LinearMap.f LM v
+_·ˡᵐ_ LM = LinearMap.f LM
 
 -- Choose 20 since function application is assumed higher than almost anything
 infixr 20 _·ˡᵐ_
@@ -234,7 +234,7 @@ infixr 20 _·ˡᵐ_
 
 _+ˡᵐ_ : {A : Set} ⦃ F : Field A ⦄
       → LinearMap A m n → LinearMap A m n → LinearMap A m n
-_+ˡᵐ_ g h = record
+g +ˡᵐ h = record
   { f = λ v → g ·ˡᵐ v +ⱽ h ·ˡᵐ v
   ; f[u+v]≡f[u]+f[v] = additivity g h
   ; f[c*v]≡c*f[v] = homogeneity g h
@@ -314,10 +314,11 @@ _·_ : ∀ {A : Set} ⦃ F : Field A ⦄ → M A ∶ m × n → Vec A n → Vec 
 
 _+_ : {A : Set} ⦃ F : Field A ⦄ → {m n : ℕ} →
       M A ∶ m × n → M A ∶ m × n → M A ∶ m × n
-M₁ + M₂ = ⟦ (extractLinearMap M₁) +ˡᵐ (extractLinearMap M₂)
-          , (extractLinearMap (M₁ ᵀ)) +ˡᵐ (extractLinearMap (M₂ ᵀ))
-          , {!!}
-          ⟧
+⟦ M₁ , M₁ᵀ , p₁ ⟧ + ⟦ M₂ , M₂ᵀ , p₂ ⟧ =
+  ⟦ M₁ +ˡᵐ M₂
+  , M₁ᵀ +ˡᵐ M₂ᵀ
+  , {!!}
+  ⟧
   where open Field {{...}}
 
 -- _*_ : {A : Set} ⦃ F : Field A ⦄ → M A ∶ m × n → M A ∶ n × p → M A ∶ m × p
