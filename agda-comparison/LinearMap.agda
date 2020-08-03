@@ -263,7 +263,36 @@ g +ˡᵐ h = record
           | sym (*ᶜ-distr-+ⱽ c (g ·ˡᵐ v) (h ·ˡᵐ v))
           = refl
 
+_*ˡᵐ_ : {A : Set} ⦃ F : Field A ⦄
+      → LinearMap A n p → LinearMap A m n → LinearMap A m p
+g *ˡᵐ h = record
+  { f = λ v → g ·ˡᵐ (h ·ˡᵐ v)
+  ; f[u+v]≡f[u]+f[v] = additivity g h
+  ; f[c*v]≡c*f[v] = homogeneity g h
+  }
+  where open Field {{...}}
+        additivity : {A : Set} ⦃ F : Field A ⦄
+                   → (g : LinearMap A n p)
+                   → (h : LinearMap A m n)
+                   → (u v : Vec A m)
+                   → g ·ˡᵐ (h ·ˡᵐ (u +ⱽ v)) ≡ g ·ˡᵐ (h ·ˡᵐ u) +ⱽ g ·ˡᵐ (h ·ˡᵐ v)
+        additivity g h u v rewrite
+            LinearMap.f[u+v]≡f[u]+f[v] h u v
+          | LinearMap.f[u+v]≡f[u]+f[v] g (LinearMap.f h u) (LinearMap.f h v)
+          = refl
+
+        homogeneity : {A : Set} ⦃ F : Field A ⦄
+                    → (g : LinearMap A n p)
+                    → (h : LinearMap A m n)
+                    → (c : A) (v : Vec A m)
+                    → g ·ˡᵐ (h ·ˡᵐ (c *ᶜ v)) ≡ c *ᶜ g ·ˡᵐ (h ·ˡᵐ v)
+        homogeneity g h c v rewrite
+            LinearMap.f[c*v]≡c*f[v] h c v
+          | LinearMap.f[c*v]≡c*f[v] g c (h ·ˡᵐ v)
+          = refl
+
 infixl 6 _+ˡᵐ_
+infixl 7 _*ˡᵐ_
 
 -- Example LinearMap values ---------------------------------------------------
 
