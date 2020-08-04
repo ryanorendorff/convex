@@ -343,28 +343,14 @@ _·_ : ∀ {A : Set} ⦃ F : Field A ⦄ → M A ∶ m × n → Vec A n → Vec 
 
 _+_ : {A : Set} ⦃ F : Field A ⦄ → {m n : ℕ} →
       M A ∶ m × n → M A ∶ m × n → M A ∶ m × n
-⟦ M₁ , M₁ᵀ , p₁ ⟧ + ⟦ M₂ , M₂ᵀ , p₂ ⟧ =
-  ⟦ M₁ +ˡᵐ M₂
-  , M₁ᵀ +ˡᵐ M₂ᵀ
-  , {!!}
-  ⟧
+⟦ M₁ , M₁ᵀ , p₁ ⟧ + ⟦ M₂ , M₂ᵀ , p₂ ⟧ = ⟦ M₁ +ˡᵐ M₂ , M₁ᵀ +ˡᵐ M₂ᵀ , {!!} ⟧
   where open Field {{...}}
 
--- _*_ : {A : Set} ⦃ F : Field A ⦄ → M A ∶ m × n → M A ∶ n × p → M A ∶ m × p
--- M₁ * M₂ = ⟦ record
---             { f = (λ v → M₁ · M₂ · v)
---             ; f[u+v]≡f[u]+f[v] = λ u v → {!!}
---             ; f[c*v]≡c*f[v] = {!!}
---             }
---           , {!!}
---           -- (λ v → M₂ ᵀ · M₁ ᵀ · v)
---           , {!!}
---           ⟧
+_*_ : {A : Set} ⦃ F : Field A ⦄ → M A ∶ m × n → M A ∶ n × p → M A ∶ m × p
+⟦ M₁ , M₁ᵀ , p₁ ⟧ * ⟦ M₂ , M₂ᵀ , p₂ ⟧ = ⟦ M₁ *ˡᵐ M₂ , M₂ᵀ *ˡᵐ M₁ᵀ , {!!} ⟧
 
-
-
-infix 6 _+_
--- infix 7 _*_
+infixl 6 _+_
+infixl 7 _*_
 infixr 20 _·_
 infixl 25 _ᵀ
 
