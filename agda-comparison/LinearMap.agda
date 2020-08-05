@@ -387,27 +387,27 @@ _ᵀ : {A : Set} ⦃ F : Field A ⦄ → M A ∶ m × n → M A ∶ n × m
 _·_ : ∀ {A : Set} ⦃ F : Field A ⦄ → M A ∶ m × n → Vec A n → Vec A m
 ⟦ f , a , _ ⟧ · x = f ·ˡᵐ x
 
-·-distr-+ⱽ : {A : Set} ⦃ F : Field A ⦄
-           → (M : M A ∶ m × n) → (u v : Vec A n)
-           → M · (u +ⱽ v) ≡ M · u +ⱽ M · v
-·-distr-+ⱽ ⟦ M , _ , _ ⟧ u v = LinearMap.f[u+v]≡f[u]+f[v] M u v
+module MProperties (A : Set) ⦃ F : Field A ⦄ where
+  open Field F
 
-·-comm-*ᶜ : {A : Set} ⦃ F : Field A ⦄
-          → (M : M A ∶ m × n) → (c : A) (v : Vec A n)
-          → M · (c *ᶜ v) ≡ c *ᶜ (M · v)
-·-comm-*ᶜ ⟦ M , _ , _ ⟧ c v = LinearMap.f[c*v]≡c*f[v] M c v
+  ·-distr-+ⱽ : (M : M A ∶ m × n) → (u v : Vec A n)
+            → M · (u +ⱽ v) ≡ M · u +ⱽ M · v
+  ·-distr-+ⱽ ⟦ M , _ , _ ⟧ u v = LinearMap.f[u+v]≡f[u]+f[v] M u v
+
+  ·-comm-*ᶜ : (M : M A ∶ m × n) → (c : A) (v : Vec A n)
+            → M · (c *ᶜ v) ≡ c *ᶜ (M · v)
+  ·-comm-*ᶜ ⟦ M , _ , _ ⟧ c v = LinearMap.f[c*v]≡c*f[v] M c v
 
 
-_+_ : {A : Set} ⦃ F : Field A ⦄ → {m n : ℕ} →
-      M A ∶ m × n → M A ∶ m × n → M A ∶ m × n
-⟦ M₁ , M₁ᵀ , p₁ ⟧ + ⟦ M₂ , M₂ᵀ , p₂ ⟧ = ⟦ M₁ +ˡᵐ M₂ , M₁ᵀ +ˡᵐ M₂ᵀ , {!!} ⟧
-  where open Field {{...}}
+  _+ᴹ_ : M A ∶ m × n → M A ∶ m × n → M A ∶ m × n
+  ⟦ M₁ , M₁ᵀ , p₁ ⟧ +ᴹ ⟦ M₂ , M₂ᵀ , p₂ ⟧ = ⟦ M₁ +ˡᵐ M₂ , M₁ᵀ +ˡᵐ M₂ᵀ , {!!} ⟧
 
-_*_ : {A : Set} ⦃ F : Field A ⦄ → M A ∶ m × n → M A ∶ n × p → M A ∶ m × p
-⟦ M₁ , M₁ᵀ , p₁ ⟧ * ⟦ M₂ , M₂ᵀ , p₂ ⟧ = ⟦ M₁ *ˡᵐ M₂ , M₂ᵀ *ˡᵐ M₁ᵀ , {!!} ⟧
+  _*ᴹ_ : M A ∶ m × n → M A ∶ n × p → M A ∶ m × p
+  ⟦ M₁ , M₁ᵀ , p₁ ⟧ *ᴹ ⟦ M₂ , M₂ᵀ , p₂ ⟧ = ⟦ M₁ *ˡᵐ M₂ , M₂ᵀ *ˡᵐ M₁ᵀ , {!!} ⟧
 
-infixl 6 _+_
-infixl 7 _*_
+  infixl 6 _+ᴹ_
+  infixl 7 _*ᴹ_
+
 infixr 20 _·_
 infixl 25 _ᵀ
 
