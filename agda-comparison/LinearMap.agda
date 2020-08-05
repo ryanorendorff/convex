@@ -266,6 +266,7 @@ module ⟨⟩-Properties (A : Set) ⦃ F : Field A ⦄ where
     | *-comm z x
     = refl
 
+open ⟨⟩-Properties
 
 -------------------------------------------------------------------------------
 --                           LinearMap constructor                           --
@@ -401,6 +402,26 @@ module MProperties (A : Set) ⦃ F : Field A ⦄ where
 
   _+ᴹ_ : M A ∶ m × n → M A ∶ m × n → M A ∶ m × n
   ⟦ M₁ , M₁ᵀ , p₁ ⟧ +ᴹ ⟦ M₂ , M₂ᵀ , p₂ ⟧ = ⟦ M₁ +ˡᵐ M₂ , M₁ᵀ +ˡᵐ M₂ᵀ , {!!} ⟧
+    where
+      -- open ⟨⟩-Properties A ⦃ F ⦄
+      ⟨⟩-proof : {A : Set} ⦃ F : Field A ⦄
+               → (M₁ M₂ : LinearMap A n m)
+               → (M₁ᵀ M₂ᵀ : LinearMap A m n)
+               → (M₁-⟨⟩-proof : (x : Vec A m) (y : Vec A n) → ⟨ x , M₁ ·ˡᵐ y ⟩ ≡ ⟨ y , M₁ᵀ ·ˡᵐ x ⟩ )
+               → (M₂-⟨⟩-proof : (x : Vec A m) (y : Vec A n) → ⟨ x , M₂ ·ˡᵐ y ⟩ ≡ ⟨ y , M₂ᵀ ·ˡᵐ x ⟩ )
+               → (x : Vec A m) (y : Vec A n)
+               → ⟨ x , (M₁ +ˡᵐ M₂) ·ˡᵐ y ⟩ ≡ ⟨ y , (M₁ᵀ +ˡᵐ M₂ᵀ) ·ˡᵐ x ⟩
+      ⟨⟩-proof {A} ⦃ F ⦄ M₁ M₂ M₁ᵀ M₂ᵀ M₁-proof M₂-proof x y = begin
+        ⟨ x , (M₁ +ˡᵐ M₂) ·ˡᵐ y ⟩
+        ≡⟨⟩
+        ⟨ x , M₁ ·ˡᵐ y +ⱽ M₂ ·ˡᵐ y ⟩
+        ≡⟨ ⟨x,y+z⟩≡⟨x,y⟩+⟨x,z⟩ x (M₁ ·ˡᵐ y) (M₂ ·ˡᵐ y) ⟩
+        ?
+        -- ⟨ x , M₁ ·ˡᵐ y ⟩ + ⟨ x , M₂ ·ˡᵐ y ⟩
+        ≡⟨ {!!} ⟩
+        ⟨ y , (M₁ᵀ +ˡᵐ M₂ᵀ) ·ˡᵐ x ⟩
+        ∎
+        w
 
   _*ᴹ_ : M A ∶ m × n → M A ∶ n × p → M A ∶ m × p
   ⟦ M₁ , M₁ᵀ , p₁ ⟧ *ᴹ ⟦ M₂ , M₂ᵀ , p₂ ⟧ = ⟦ M₁ *ˡᵐ M₂ , M₂ᵀ *ˡᵐ M₁ᵀ , {!!} ⟧
