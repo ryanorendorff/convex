@@ -75,6 +75,14 @@ record Field {ℓ} (A : Set ℓ) : Set ℓ where
     *-distr-+ : (a b c : A) → a * (b + c) ≡ a * b + a * c
 
 
+module FieldProperties (A : Set) ⦃ F : Field A ⦄ where
+  open Field {{...}}
+
+  0ᶠ+0ᶠ≡0ᶠ : 0ᶠ + 0ᶠ ≡ 0ᶠ
+  0ᶠ+0ᶠ≡0ᶠ = +-0 0ᶠ
+
+open FieldProperties
+
 {-
 If we want the reals, we need a few things
 
