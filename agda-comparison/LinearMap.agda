@@ -388,7 +388,7 @@ _ᵀ : {A : Set} ⦃ F : Field A ⦄ → M A ∶ m × n → M A ∶ n × m
 _·_ : ∀ {A : Set} ⦃ F : Field A ⦄ → M A ∶ m × n → Vec A n → Vec A m
 ⟦ f , a , _ ⟧ · x = f ·ˡᵐ x
 
-module MProperties (A : Set) ⦃ F : Field A ⦄ where
+module MProperties {A : Set} ⦃ F : Field A ⦄ where
   open Field F
 
   ·-distr-+ⱽ : (M : M A ∶ m × n) → (u v : Vec A n)
@@ -429,10 +429,36 @@ module MProperties (A : Set) ⦃ F : Field A ⦄ where
         ∎
 
   _*ᴹ_ : M A ∶ m × n → M A ∶ n × p → M A ∶ m × p
-  ⟦ M₁ , M₁ᵀ , p₁ ⟧ *ᴹ ⟦ M₂ , M₂ᵀ , p₂ ⟧ = ⟦ M₁ *ˡᵐ M₂ , M₂ᵀ *ˡᵐ M₁ᵀ , {!!} ⟧
+  ⟦ M₁ , M₁ᵀ , p₁ ⟧ *ᴹ ⟦ M₂ , M₂ᵀ , p₂ ⟧ =
+    ⟦ M₁ *ˡᵐ M₂
+    , M₂ᵀ *ˡᵐ M₁ᵀ
+    , ⟨⟩-proof M₁ M₂ M₁ᵀ M₂ᵀ p₁ p₂
+    ⟧
+    where
+      ⟨⟩-proof : (M₁ : LinearMap A n m) (M₂ : LinearMap A p n)
+               → (M₁ᵀ : LinearMap A m n) (M₂ᵀ : LinearMap A n p)
+               → (M₁-⟨⟩-proof : (x : Vec A m) (y : Vec A n)
+                               → ⟨ x , M₁ ·ˡᵐ y ⟩ ≡ ⟨ y , M₁ᵀ ·ˡᵐ x ⟩ )
+               → (M₂-⟨⟩-proof : (x : Vec A n) (y : Vec A p)
+                               → ⟨ x , M₂ ·ˡᵐ y ⟩ ≡ ⟨ y , M₂ᵀ ·ˡᵐ x ⟩ )
+               → (x : Vec A m) (y : Vec A p)
+               → ⟨ x , (M₁ *ˡᵐ M₂) ·ˡᵐ y ⟩ ≡ ⟨ y , (M₂ᵀ *ˡᵐ M₁ᵀ) ·ˡᵐ x ⟩
+      ⟨⟩-proof M₁ M₂ M₁ᵀ M₂ᵀ M₁-proof M₂-proof x y = begin
+        ⟨ x , (M₁ *ˡᵐ M₂) ·ˡᵐ y ⟩
+        ≡⟨⟩
+        ⟨ x , M₁ ·ˡᵐ M₂ ·ˡᵐ y ⟩
+        ≡⟨ M₁-proof x (M₂ ·ˡᵐ y) ⟩
+        ⟨ M₂ ·ˡᵐ y , M₁ᵀ ·ˡᵐ x ⟩
+        ≡⟨ ⟨⟩-comm (M₂ ·ˡᵐ y) (M₁ᵀ ·ˡᵐ x) ⟩
+        ⟨ M₁ᵀ ·ˡᵐ x , M₂ ·ˡᵐ y ⟩
+        ≡⟨ M₂-proof (M₁ᵀ ·ˡᵐ x) y ⟩
+        ⟨ y , (M₂ᵀ *ˡᵐ M₁ᵀ) ·ˡᵐ x ⟩
+        ∎
 
   infixl 6 _+ᴹ_
   infixl 7 _*ᴹ_
+
+open MProperties
 
 infixr 20 _·_
 infixl 25 _ᵀ
