@@ -466,7 +466,7 @@ infixl 25 _ᵀ
 
 -- Matrix Free Operators ------------------------------------------------------
 
-I : {A : Set} ⦃ F : Field A ⦄ → M A ∶ n × n
+I : {A : Set} {n : ℕ} ⦃ F : Field A ⦄ → M A ∶ n × n
 I = ⟦ idₗₘ , idₗₘ , id-transpose  ⟧
   where
     id-transpose : ⦃ F : Field A ⦄ → (x y : Vec A n)
@@ -477,20 +477,27 @@ I = ⟦ idₗₘ , idₗₘ , id-transpose  ⟧
 
 
 -------------------------------------------------------------------------------
---                            Proofs on LinearMaps                           --
+--                                Proofs on M                                --
 -------------------------------------------------------------------------------
 
-idᵀᵀ : {A : Set} ⦃ F : Field A ⦄ → (B : M A ∶ m × n) → B ᵀ ᵀ ≡ B
-idᵀᵀ ⟦ M , Mᵀ , p ⟧ = {!!}
+sym-sym : ∀ {ℓ} {A : Set ℓ} {x y : A} (p : x ≡ y) → sym (sym p) ≡ p
+sym-sym refl = refl
 
--- ᵀ-distr-* : (L : M A ∶ m × n) (R : M A ∶ n × p)
---           → (L * R) ᵀ ≡ (R ᵀ * L ᵀ)
--- ᵀ-distr-* L R rewrite idᵀᵀ L | idᵀᵀ R = refl
+-- Hmm, maybe adding the proof into the constructor was a poor idea, as
+-- these proofs seem tricky. Although I need the proofs to construct *ᴹ and
+-- +ᴹ proofs correct.
+
+-- ᵀᵀ : {A : Set} ⦃ F : Field A ⦄ → (B : M A ∶ m × n) → B ᵀ ᵀ ≡ B
+-- ᵀᵀ ⟦ M , Mᵀ , p ⟧ = {!!}
+
+-- ᵀ-distr-* : {A : Set} ⦃ F : Field A ⦄ → (L : M A ∶ m × n) (R : M A ∶ n × p)
+--           → (L *ᴹ R) ᵀ ≡ (R ᵀ *ᴹ L ᵀ)
+-- ᵀ-distr-* L R = {!!}
 --
 -- ᵀ-distr-+ : {A : Set} ⦃ F : Field A ⦄
 --           → (L : M A ∶ m × n) (R : M A ∶ m × n)
 --           → (L + R) ᵀ ≡ (L ᵀ + R ᵀ)
 -- ᵀ-distr-+ L R rewrite idᵀᵀ L | idᵀᵀ R = refl
---
--- I-idempotent : {A : Set} {n : ℕ} → (I {A} {n}) * I ≡ I
--- I-idempotent = refl
+
+-- I-idempotent : {A : Set} {n : ℕ} ⦃ F : Field A ⦄ → (I {A} {n} ⦃ F ⦄) *ᴹ I ≡ I
+-- I-idempotent = {!!}
