@@ -265,18 +265,28 @@ module ⟨⟩-Properties (A : Set) ⦃ F : Field A ⦄ where
       | +-assoc (x * z) qx (y * z + qy)
       = refl
 
-  -- TODO: Simplify with the following relation
-  -- (x +ⱽ y) ∘ⱽ z ≡ (x +ⱽ z) * (y +ⱽ z)
-  -- Probably prove ∘ⱽ-comm and then the above
   ⟨x+y,z⟩≡⟨x,z⟩+⟨y,z⟩ : (x y z : Vec A n)
                       → ⟨ x +ⱽ y , z ⟩ ≡ (⟨ x , z ⟩) + (⟨ y , z ⟩)
-  ⟨x+y,z⟩≡⟨x,z⟩+⟨y,z⟩ []ⱽ []ⱽ []ⱽ = sym (0ᶠ+0ᶠ≡0ᶠ A ⦃ F ⦄)
-  ⟨x+y,z⟩≡⟨x,z⟩+⟨y,z⟩ (x ∷ⱽ xs) (y ∷ⱽ ys) (z ∷ⱽ zs) rewrite
-      ⟨x+y,z⟩≡⟨x,z⟩+⟨y,z⟩ xs ys zs
-    | add-subproof x y z (foldr (λ v → A) _+_ 0ᶠ (zipWith _*_ xs zs))
-                         (foldr (λ v → A) _+_ 0ᶠ (zipWith _*_ ys zs))
-    = refl
+  ⟨x+y,z⟩≡⟨x,z⟩+⟨y,z⟩ x y z = begin
+    ⟨ x +ⱽ y , z ⟩
+    ≡⟨⟩
+    sum ((x +ⱽ y) ∘ⱽ z )
+    ≡⟨ cong sum (∘ⱽ-comm (x +ⱽ y) z) ⟩
+    sum (z ∘ⱽ (x +ⱽ y))
+    ≡⟨ cong sum (∘ⱽ-distr-+ⱽ z x y) ⟩
+    sum (z ∘ⱽ x +ⱽ z ∘ⱽ y)
+    ≡⟨ sum-distr-+ⱽ (z ∘ⱽ x) (z ∘ⱽ y) ⟩
+    sum (z ∘ⱽ x) + sum (z ∘ⱽ y)
+    ≡⟨⟩
+    ⟨ z , x ⟩ + ⟨ z , y ⟩
+    ≡⟨ cong (_+ ⟨ z , y ⟩) (⟨⟩-comm z x) ⟩
+    ⟨ x , z ⟩ + ⟨ z , y ⟩
+    ≡⟨ cong (⟨ x , z ⟩ +_ ) (⟨⟩-comm z y) ⟩
+    ⟨ x , z ⟩ + ⟨ y , z ⟩
+    ∎
 
+  -- TODO: remove add-subproof
+  -- Potentially abstract out common subproof from the above
   ⟨x,y+z⟩≡⟨x,y⟩+⟨x,z⟩ : (x y z : Vec A n)
                       → ⟨ x , y +ⱽ z ⟩ ≡ (⟨ x , y ⟩) + (⟨ x , z ⟩)
   ⟨x,y+z⟩≡⟨x,y⟩+⟨x,z⟩ []ⱽ []ⱽ []ⱽ = sym (0ᶠ+0ᶠ≡0ᶠ A ⦃ F ⦄)
