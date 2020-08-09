@@ -147,6 +147,22 @@ sum : {A : Set} ⦃ F : Field A ⦄ → Vec A n → A
 sum = foldr _ _+_ 0ᶠ
   where open Field {{...}}
 
+module sumProperties {A} ⦃ F : Field A ⦄ where
+  open Field F
+
+  sum-distr-+ⱽ : (v₁ v₂ : Vec A n) → sum (v₁ +ⱽ v₂) ≡ sum v₁ + sum v₂
+  sum-distr-+ⱽ []ⱽ []ⱽ = sym (0ᶠ+0ᶠ≡0ᶠ A ⦃ F ⦄)
+  sum-distr-+ⱽ (v₁ ∷ⱽ vs₁) (v₂ ∷ⱽ vs₂) rewrite
+      sum-distr-+ⱽ vs₁ vs₂
+    | +-assoc (v₁ + v₂) (foldr (λ v → A) _+_ 0ᶠ vs₁) (foldr (λ v → A) _+_ 0ᶠ vs₂)
+    | sym (+-assoc v₁ v₂ (foldr (λ v → A) _+_ 0ᶠ vs₁))
+    | +-comm v₂ (foldr (λ v → A) _+_ 0ᶠ vs₁)
+    | +-assoc v₁ (foldr (λ v → A) _+_ 0ᶠ vs₁) v₂
+    | sym (+-assoc (v₁ + (foldr (λ v → A) _+_ 0ᶠ vs₁)) v₂ (foldr (λ v → A) _+_ 0ᶠ vs₂))
+    = refl
+
+open sumProperties
+
 -- Inner product
 ⟨_,_⟩ : {A : Set} ⦃ F : Field A ⦄ → Vec A n → Vec A n → A
 ⟨ v₁ , v₂ ⟩ =  sum (v₁ ∘ⱽ v₂)
@@ -181,6 +197,13 @@ zipWith-comm f f-comm (x ∷ⱽ xs) (y ∷ⱽ ys) rewrite
   x₂ + x₁ ∷ⱽ vs₂ +ⱽ vs₁
   ∎
   where open Field {{...}}
+
+∘ⱽ-comm : ⦃ F : Field A ⦄ → (v₁ v₂ : Vec A n) → v₁ ∘ⱽ v₂ ≡ v₂ ∘ⱽ v₁
+∘ⱽ-comm []ⱽ []ⱽ = refl
+∘ⱽ-comm ⦃ F ⦄ (v₁ ∷ⱽ vs₁) (v₂ ∷ⱽ vs₂) rewrite
+    ∘ⱽ-comm vs₁ vs₂
+  | Field.*-comm F v₁ v₂
+  = refl
 
 ∘ⱽ-distr-+ⱽ : ∀ {A n} ⦃ F : Field A ⦄ → (a u v : Vec A n)
             → a ∘ⱽ (u +ⱽ v) ≡ a ∘ⱽ u +ⱽ a ∘ⱽ v
