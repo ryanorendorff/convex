@@ -5,7 +5,8 @@ open import Data.Nat using (ℕ; suc; zero)
 
 open import Data.Empty
 
-open import Data.Vec using (Vec; foldr; zipWith; map) renaming ([] to []ⱽ; _∷_ to _∷ⱽ_)
+open import Data.Vec using (Vec; foldr; zipWith; map)
+                     renaming ([] to []ⱽ; _∷_ to _∷ⱽ_)
 
 open import Relation.Binary.PropositionalEquality
 open ≡-Reasoning
@@ -16,10 +17,9 @@ open import VectorList using (VectorList; splitToVectorList; []ⱽᴸ; _∷ⱽ�
 
 private
   variable
-    m n p q : ℕ
-    A : Set
-    a b c : A
     ℓ : Level
+    A : Set ℓ
+    m n p q : ℕ
 
 
 -- TODO: Can this be replaced with something like the List⁺ definition so that
@@ -30,15 +30,15 @@ data Vec⁺ (A : Set ℓ) : ℕ → Set ℓ where
   _∷_ : ∀ {n} (x : A) (xs : Vec⁺ A n) → Vec⁺ A (suc n)
 
 -- Want to prove that is it not possible to construct an empty vector
-emptyVecImpossible : {A : Set ℓ} → Vec⁺ A 0 → ⊥
+emptyVecImpossible : Vec⁺ A 0 → ⊥
 emptyVecImpossible = λ ()
 
-Vec⁺→Vec : {A : Set ℓ} → Vec⁺ A n → Vec A n
+Vec⁺→Vec : Vec⁺ A n → Vec A n
 Vec⁺→Vec [ v ] = v ∷ⱽ []ⱽ
 Vec⁺→Vec (v ∷ vs⁺) = v ∷ⱽ Vec⁺→Vec vs⁺
 
-Vec⁺→n≢0 : {A : Set ℓ} → Vec⁺ A n → n ≢ 0
-Vec⁺→n≢0 {A} {suc n} v = suc≢0
+Vec⁺→n≢0 : Vec⁺ A n → n ≢ 0
+Vec⁺→n≢0 {ℓ} {A} {suc n} v = suc≢0
   where
     suc≢0 : {n : ℕ} → suc n ≢ 0
     suc≢0 {zero} ()
@@ -48,7 +48,7 @@ Vec⁺→n≢0 {A} {suc n} v = suc≢0
 -- Vec→Vec⁺ {ℓ} {A} {0} p []ⱽ = {!p !}
 -- Vec→Vec⁺ {ℓ} {A} {suc n} p (x ∷ⱽ x₁) = {!!}
 
-record Field {ℓ} (A : Set ℓ) : Set ℓ where
+record Field (A : Set ℓ) : Set ℓ where
 
   infixl 6 _+_
   infixl 7 _*_
@@ -74,8 +74,12 @@ record Field {ℓ} (A : Set ℓ) : Set ℓ where
     *-inv     : (a : A)     → a ⁻¹ * a ≡ 1ᶠ -- Missing a ≠ 0 in clause
     *-distr-+ : (a b c : A) → a * (b + c) ≡ a * b + a * c
 
+private
+  variable
+    ⦃ F ⦄ : Field A
 
-module FieldProperties (A : Set) ⦃ F : Field A ⦄ where
+
+module FieldProperties ⦃ F : Field A ⦄ where
   open Field {{...}}
 
   0ᶠ+0ᶠ≡0ᶠ : 0ᶠ + 0ᶠ ≡ 0ᶠ
@@ -128,12 +132,12 @@ _+ⱽ_ (x₁ ∷ⱽ xs₁) (x₂ ∷ⱽ xs₂) = x₁ + x₂ ∷ⱽ (xs₁ +ⱽ 
   where open Field {{...}}
 
 -- Vector Hadamard product
-_∘ⱽ_ : {A : Set} ⦃ F : Field A ⦄ → Vec A n → Vec A n → Vec A n
+_∘ⱽ_ : ⦃ F : Field A ⦄ → Vec A n → Vec A n → Vec A n
 _∘ⱽ_ = zipWith _*_
   where open Field {{...}}
 
 -- Multiply vector by a constant
-_*ᶜ_ : {A : Set} ⦃ F : Field A ⦄ → A → Vec A n → Vec A n
+_*ᶜ_ : ⦃ F : Field A ⦄ → A → Vec A n → Vec A n
 c *ᶜ v = map (c *_) v
   where open Field {{...}}
 
@@ -142,16 +146,15 @@ infixl  6 _+ⱽ_
 infixl  7 _∘ⱽ_
 infixl 10 _*ᶜ_
 
-
-sum : {A : Set} ⦃ F : Field A ⦄ → Vec A n → A
+sum : ⦃ F : Field A ⦄ → Vec A n → A
 sum = foldr _ _+_ 0ᶠ
   where open Field {{...}}
 
-module sumProperties {A} ⦃ F : Field A ⦄ where
+module sumProperties ⦃ F : Field A ⦄ where
   open Field F
 
   sum-distr-+ⱽ : (v₁ v₂ : Vec A n) → sum (v₁ +ⱽ v₂) ≡ sum v₁ + sum v₂
-  sum-distr-+ⱽ []ⱽ []ⱽ = sym (0ᶠ+0ᶠ≡0ᶠ A ⦃ F ⦄)
+  sum-distr-+ⱽ []ⱽ []ⱽ = sym (0ᶠ+0ᶠ≡0ᶠ)
   sum-distr-+ⱽ (v₁ ∷ⱽ vs₁) (v₂ ∷ⱽ vs₂) rewrite
       sum-distr-+ⱽ vs₁ vs₂
     | +-assoc (v₁ + v₂) (foldr (λ v → A) _+_ 0ᶠ vs₁) (foldr (λ v → A) _+_ 0ᶠ vs₂)
@@ -164,7 +167,7 @@ module sumProperties {A} ⦃ F : Field A ⦄ where
 open sumProperties
 
 -- Inner product
-⟨_,_⟩ : {A : Set} ⦃ F : Field A ⦄ → Vec A n → Vec A n → A
+⟨_,_⟩ : ⦃ F : Field A ⦄ → Vec A n → Vec A n → A
 ⟨ v₁ , v₂ ⟩ =  sum (v₁ ∘ⱽ v₂)
 
 
@@ -205,7 +208,7 @@ zipWith-comm f f-comm (x ∷ⱽ xs) (y ∷ⱽ ys) rewrite
   | Field.*-comm F v₁ v₂
   = refl
 
-∘ⱽ-distr-+ⱽ : ∀ {A n} ⦃ F : Field A ⦄ → (a u v : Vec A n)
+∘ⱽ-distr-+ⱽ : ⦃ F : Field A ⦄ → (a u v : Vec A n)
             → a ∘ⱽ (u +ⱽ v) ≡ a ∘ⱽ u +ⱽ a ∘ⱽ v
 ∘ⱽ-distr-+ⱽ []ⱽ []ⱽ []ⱽ = refl
 ∘ⱽ-distr-+ⱽ ⦃ F ⦄ (a ∷ⱽ as) (u ∷ⱽ us) (v ∷ⱽ vs) rewrite
@@ -214,7 +217,7 @@ zipWith-comm f f-comm (x ∷ⱽ xs) (y ∷ⱽ ys) rewrite
   = refl
 
 -- Homogeneity of degree 1 for linear maps
-∘ⱽ*ᶜ≡*ᶜ∘ⱽ : ∀ {A n} ⦃ F : Field A ⦄ → (c : A) (u v : Vec A n)
+∘ⱽ*ᶜ≡*ᶜ∘ⱽ : ⦃ F : Field A ⦄ → (c : A) (u v : Vec A n)
           → u ∘ⱽ c *ᶜ v ≡ c *ᶜ (u ∘ⱽ v)
 ∘ⱽ*ᶜ≡*ᶜ∘ⱽ c []ⱽ []ⱽ = refl
 ∘ⱽ*ᶜ≡*ᶜ∘ⱽ ⦃ F ⦄ c (u ∷ⱽ us) (v ∷ⱽ vs) rewrite
@@ -224,7 +227,7 @@ zipWith-comm f f-comm (x ∷ⱽ xs) (y ∷ⱽ ys) rewrite
   | sym (Field.*-assoc F c u v)
   = refl
 
-*ᶜ-distr-+ⱽ : {A : Set} ⦃ F : Field A ⦄
+*ᶜ-distr-+ⱽ : ⦃ F : Field A ⦄
             → (c : A) (u v : Vec A n)
             → c *ᶜ (u +ⱽ v) ≡ c *ᶜ u +ⱽ c *ᶜ v
 *ᶜ-distr-+ⱽ c []ⱽ []ⱽ = refl
@@ -246,7 +249,7 @@ zipWith-comm f f-comm (x ∷ⱽ xs) (y ∷ⱽ ys) rewrite
 --   ∀ λ ∈ F, B(λv, w) ≡ B(v, λw) ≡ λB(v, w)
 --   B(v₁ + v₂, w) ≡ B(v₁, w) + B(v₂, w) ∧ B(v, w₁ + w₂) ≡ B(v, w₁) + B(v, w₂)
 -- Additivity in both arguments
-module ⟨⟩-Properties (A : Set) ⦃ F : Field A ⦄ where
+module ⟨⟩-Properties ⦃ F : Field A ⦄ where
   open Field F
 
   ⟨x+y,z⟩≡⟨x,z⟩+⟨y,z⟩ : (x y z : Vec A n)
@@ -289,7 +292,7 @@ open ⟨⟩-Properties
 --                           LinearMap constructor                           --
 -------------------------------------------------------------------------------
 
-record LinearMap (A : Set) ⦃ F : Field A ⦄ (m n : ℕ) : Set where
+record LinearMap (A : Set ℓ) ⦃ F : Field A ⦄ (m n : ℕ) : Set ℓ where
   field
     f : (Vec A m → Vec A n)
 
@@ -300,22 +303,21 @@ record LinearMap (A : Set) ⦃ F : Field A ⦄ (m n : ℕ) : Set where
     f[c*v]≡c*f[v] : (c : A) → (v : Vec A m) → f (c *ᶜ v) ≡ c *ᶜ (f v)
 
 
-_·ˡᵐ_ : {A : Set} ⦃ F : Field A ⦄ → LinearMap A m n → Vec A m → Vec A n
+_·ˡᵐ_ : ⦃ F : Field A ⦄ → LinearMap A m n → Vec A m → Vec A n
 _·ˡᵐ_ LM = LinearMap.f LM
 
 -- Choose 20 since function application is assumed higher than almost anything
 infixr 20 _·ˡᵐ_
 
 
-_+ˡᵐ_ : {A : Set} ⦃ F : Field A ⦄
-      → LinearMap A m n → LinearMap A m n → LinearMap A m n
+_+ˡᵐ_ : ⦃ F : Field A ⦄ → LinearMap A m n → LinearMap A m n → LinearMap A m n
 g +ˡᵐ h = record
   { f = λ v → g ·ˡᵐ v +ⱽ h ·ˡᵐ v
   ; f[u+v]≡f[u]+f[v] = additivity g h
   ; f[c*v]≡c*f[v] = homogeneity g h
   }
   where open Field {{...}}
-        additivity : {A : Set} ⦃ F : Field A ⦄
+        additivity : ⦃ F : Field A ⦄
                    → (g h : LinearMap A m n)→ (u v : Vec A m)
                    → g ·ˡᵐ (u +ⱽ v) +ⱽ h ·ˡᵐ (u +ⱽ v) ≡
                       g ·ˡᵐ u +ⱽ h ·ˡᵐ u +ⱽ (g ·ˡᵐ v +ⱽ h ·ˡᵐ v)
@@ -329,7 +331,7 @@ g +ˡᵐ h = record
           | sym (+ⱽ-assoc (g ·ˡᵐ u) (h ·ˡᵐ u) (g ·ˡᵐ v +ⱽ h ·ˡᵐ v))
           = refl
 
-        homogeneity : {A : Set} ⦃ F : Field A ⦄
+        homogeneity : ⦃ F : Field A ⦄
                     → (g h : LinearMap A m n) → (c : A) (v : Vec A m)
                     → g ·ˡᵐ (c *ᶜ v) +ⱽ h ·ˡᵐ (c *ᶜ v) ≡ c *ᶜ (g ·ˡᵐ v +ⱽ h ·ˡᵐ v)
         homogeneity g h c v rewrite
@@ -338,15 +340,14 @@ g +ˡᵐ h = record
           | sym (*ᶜ-distr-+ⱽ c (g ·ˡᵐ v) (h ·ˡᵐ v))
           = refl
 
-_*ˡᵐ_ : {A : Set} ⦃ F : Field A ⦄
-      → LinearMap A n p → LinearMap A m n → LinearMap A m p
+_*ˡᵐ_ : ⦃ F : Field A ⦄ → LinearMap A n p → LinearMap A m n → LinearMap A m p
 g *ˡᵐ h = record
   { f = λ v → g ·ˡᵐ (h ·ˡᵐ v)
   ; f[u+v]≡f[u]+f[v] = additivity g h
   ; f[c*v]≡c*f[v] = homogeneity g h
   }
   where open Field {{...}}
-        additivity : {A : Set} ⦃ F : Field A ⦄
+        additivity : ⦃ F : Field A ⦄
                    → (g : LinearMap A n p)
                    → (h : LinearMap A m n)
                    → (u v : Vec A m)
@@ -356,7 +357,7 @@ g *ˡᵐ h = record
           | LinearMap.f[u+v]≡f[u]+f[v] g (LinearMap.f h u) (LinearMap.f h v)
           = refl
 
-        homogeneity : {A : Set} ⦃ F : Field A ⦄
+        homogeneity : ⦃ F : Field A ⦄
                     → (g : LinearMap A n p)
                     → (h : LinearMap A m n)
                     → (c : A) (v : Vec A m)
@@ -371,14 +372,14 @@ infixl 7 _*ˡᵐ_
 
 -- Example LinearMap values ---------------------------------------------------
 
-idₗₘ : ∀ {A n} ⦃ f : Field A ⦄ → LinearMap A n n
+idₗₘ : ⦃ F : Field A ⦄ → LinearMap A n n
 idₗₘ = record
   { f = id
   ; f[u+v]≡f[u]+f[v] = λ u v → refl
   ; f[c*v]≡c*f[v] = λ c v → refl
   }
 
-diagₗₘ : ∀ {A n} ⦃ f : Field A ⦄ → Vec A n → LinearMap A n n
+diagₗₘ : ⦃ F : Field A ⦄ → Vec A n → LinearMap A n n
 diagₗₘ d = record
   { f = d ∘ⱽ_
   ; f[u+v]≡f[u]+f[v] = ∘ⱽ-distr-+ⱽ d
@@ -389,23 +390,23 @@ diagₗₘ d = record
 --                          M constructor and values                         --
 -------------------------------------------------------------------------------
 
-data M_∶_×_ (A : Set) ⦃ F : Field A ⦄ (m n : ℕ) : Set where
+data M_∶_×_ (A : Set ℓ) ⦃ F : Field A ⦄ (m n : ℕ) : Set ℓ where
   ⟦_,_,_⟧ : (M : LinearMap A n m )
           → (Mᵀ : LinearMap A m n )
           → (p : (x : Vec A m) → (y : Vec A n)
                → ⟨ x , M ·ˡᵐ y ⟩ ≡ ⟨ y , Mᵀ ·ˡᵐ x ⟩ )
           → M A ∶ m × n
 
-extractLinearMap : {A : Set} ⦃ F : Field A ⦄ → M A ∶ m × n → LinearMap A n m
+extractLinearMap : ⦃ F : Field A ⦄ → M A ∶ m × n → LinearMap A n m
 extractLinearMap ⟦ M , Mᵀ , p ⟧ = M
 
-_ᵀ : {A : Set} ⦃ F : Field A ⦄ → M A ∶ m × n → M A ∶ n × m
+_ᵀ : ⦃ F : Field A ⦄ → M A ∶ m × n → M A ∶ n × m
 ⟦ f , a , p ⟧ ᵀ = ⟦ a , f , (λ x y → sym (p y x)) ⟧
 
-_·_ : ∀ {A : Set} ⦃ F : Field A ⦄ → M A ∶ m × n → Vec A n → Vec A m
+_·_ : ⦃ F : Field A ⦄ → M A ∶ m × n → Vec A n → Vec A m
 ⟦ f , a , _ ⟧ · x = f ·ˡᵐ x
 
-module MProperties {A : Set} ⦃ F : Field A ⦄ where
+module MProperties ⦃ F : Field A ⦄ where
   open Field F
 
   ·-distr-+ⱽ : (M : M A ∶ m × n) → (u v : Vec A n)
@@ -435,13 +436,13 @@ module MProperties {A : Set} ⦃ F : Field A ⦄ where
         ⟨ x , (M₁ +ˡᵐ M₂) ·ˡᵐ y ⟩
         ≡⟨⟩
         ⟨ x , M₁ ·ˡᵐ y +ⱽ M₂ ·ˡᵐ y ⟩
-        ≡⟨ ⟨x,y+z⟩≡⟨x,y⟩+⟨x,z⟩ A ⦃ F ⦄ x (M₁ ·ˡᵐ y) (M₂ ·ˡᵐ y) ⟩
+        ≡⟨ ⟨x,y+z⟩≡⟨x,y⟩+⟨x,z⟩ x (M₁ ·ˡᵐ y) (M₂ ·ˡᵐ y) ⟩
         ⟨ x , M₁ ·ˡᵐ y ⟩ + ⟨ x , M₂ ·ˡᵐ y ⟩
         ≡⟨ cong (_+ ⟨ x , M₂ ·ˡᵐ y ⟩) (M₁-proof x y) ⟩
         ⟨ y , M₁ᵀ ·ˡᵐ x ⟩ + ⟨ x , M₂ ·ˡᵐ y ⟩
         ≡⟨ cong (⟨ y , M₁ᵀ ·ˡᵐ x ⟩ +_) (M₂-proof x y) ⟩
         ⟨ y , M₁ᵀ ·ˡᵐ x ⟩ + ⟨ y , M₂ᵀ ·ˡᵐ x ⟩
-        ≡⟨ sym (⟨x,y+z⟩≡⟨x,y⟩+⟨x,z⟩ A ⦃ F ⦄ y (M₁ᵀ ·ˡᵐ x) (M₂ᵀ ·ˡᵐ x))  ⟩
+        ≡⟨ sym (⟨x,y+z⟩≡⟨x,y⟩+⟨x,z⟩ y (M₁ᵀ ·ˡᵐ x) (M₂ᵀ ·ˡᵐ x))  ⟩
         ⟨ y , (M₁ᵀ +ˡᵐ M₂ᵀ) ·ˡᵐ x ⟩
         ∎
 
@@ -483,7 +484,7 @@ infixl 25 _ᵀ
 
 -- Matrix Free Operators ------------------------------------------------------
 
-I : {A : Set} {n : ℕ} ⦃ F : Field A ⦄ → M A ∶ n × n
+I : ⦃ F : Field A ⦄ → M A ∶ n × n
 I = ⟦ idₗₘ , idₗₘ , id-transpose  ⟧
   where
     id-transpose : ⦃ F : Field A ⦄ → (x y : Vec A n)
@@ -497,7 +498,7 @@ I = ⟦ idₗₘ , idₗₘ , id-transpose  ⟧
 --                                Proofs on M                                --
 -------------------------------------------------------------------------------
 
-sym-sym : ∀ {ℓ} {A : Set ℓ} {x y : A} (p : x ≡ y) → sym (sym p) ≡ p
+sym-sym : {x y : A} (p : x ≡ y) → sym (sym p) ≡ p
 sym-sym refl = refl
 
 -- Hmm, maybe adding the proof into the constructor was a poor idea, as
