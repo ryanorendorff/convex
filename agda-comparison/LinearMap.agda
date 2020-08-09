@@ -249,22 +249,6 @@ zipWith-comm f f-comm (x ∷ⱽ xs) (y ∷ⱽ ys) rewrite
 module ⟨⟩-Properties (A : Set) ⦃ F : Field A ⦄ where
   open Field F
 
-  private
-
-    add-subproof : (x y z qx qy : A)
-                 → (x + y) * z + (qx + qy) ≡ x * z + qx + (y * z + qy)
-    add-subproof x y z qx qy rewrite
-        *-comm (x + y) z
-      | *-distr-+ z x y
-      | *-comm z x
-      | *-comm z y
-      | sym (+-assoc (x * z) (y * z) (qx + qy))
-      | +-assoc (y * z) qx qy
-      | +-comm (y * z) qx
-      | sym (+-assoc qx (y * z) qy)
-      | +-assoc (x * z) qx (y * z + qy)
-      = refl
-
   ⟨x+y,z⟩≡⟨x,z⟩+⟨y,z⟩ : (x y z : Vec A n)
                       → ⟨ x +ⱽ y , z ⟩ ≡ (⟨ x , z ⟩) + (⟨ y , z ⟩)
   ⟨x+y,z⟩≡⟨x,z⟩+⟨y,z⟩ x y z = begin
@@ -285,19 +269,19 @@ module ⟨⟩-Properties (A : Set) ⦃ F : Field A ⦄ where
     ⟨ x , z ⟩ + ⟨ y , z ⟩
     ∎
 
-  -- TODO: remove add-subproof
-  -- Potentially abstract out common subproof from the above
   ⟨x,y+z⟩≡⟨x,y⟩+⟨x,z⟩ : (x y z : Vec A n)
                       → ⟨ x , y +ⱽ z ⟩ ≡ (⟨ x , y ⟩) + (⟨ x , z ⟩)
-  ⟨x,y+z⟩≡⟨x,y⟩+⟨x,z⟩ []ⱽ []ⱽ []ⱽ = sym (0ᶠ+0ᶠ≡0ᶠ A ⦃ F ⦄)
-  ⟨x,y+z⟩≡⟨x,y⟩+⟨x,z⟩ (x ∷ⱽ xs) (y ∷ⱽ ys) (z ∷ⱽ zs) rewrite
-      ⟨x,y+z⟩≡⟨x,y⟩+⟨x,z⟩ xs ys zs
-    | *-comm x (y + z)
-    | add-subproof y z x (foldr (λ v → A) _+_ 0ᶠ (zipWith _*_ xs ys))
-                         (foldr (λ v → A) _+_ 0ᶠ (zipWith _*_ xs zs))
-    | *-comm y x
-    | *-comm z x
-    = refl
+  ⟨x,y+z⟩≡⟨x,y⟩+⟨x,z⟩ x y z = begin
+    ⟨ x , y +ⱽ z ⟩
+    ≡⟨ ⟨⟩-comm x (y +ⱽ z) ⟩
+    ⟨ y +ⱽ z , x ⟩
+    ≡⟨ ⟨x+y,z⟩≡⟨x,z⟩+⟨y,z⟩ y z x ⟩
+    ⟨ y , x ⟩ + ⟨ z , x ⟩
+    ≡⟨ cong (_+ ⟨ z , x ⟩) (⟨⟩-comm y x) ⟩
+    ⟨ x , y ⟩ + ⟨ z , x ⟩
+    ≡⟨ cong (⟨ x , y ⟩ +_ ) (⟨⟩-comm z x) ⟩
+    ⟨ x , y ⟩ + ⟨ x , z ⟩
+    ∎
 
 open ⟨⟩-Properties
 
