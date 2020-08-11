@@ -63,8 +63,8 @@ record Field (A : Set ℓ) : Set ℓ where
     _+_ : A → A → A
     _*_ : A → A → A
 
-    0ᶠ : A
-    1ᶠ  : A
+    0ᶠ   : A
+    1ᶠ   : A
     -_   : A → A -- + inverse
     _⁻¹  : A → A -- * inverse
 
@@ -75,7 +75,7 @@ record Field (A : Set ℓ) : Set ℓ where
     *-assoc   : (a b c : A) → a * (b * c) ≡ (a * b) * c
     *-comm    : (a b : A)   → a * b ≡ b * a
     *-1       : (a : A)     → a * 1ᶠ ≡ a
-    *-inv     : (a : A)     → a ⁻¹ * a ≡ 1ᶠ -- Missing a ≠ 0 in clause
+    *-inv     : (a : A)     → (a ≢ 0ᶠ) → a ⁻¹ * a ≡ 1ᶠ
     *-distr-+ : (a b c : A) → a * (b + c) ≡ a * b + a * c
 
 private
