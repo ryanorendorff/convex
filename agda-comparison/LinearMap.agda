@@ -13,8 +13,6 @@ open ≡-Reasoning
 
 open import Function using (id)
 
-open import VectorList using (VectorList; splitToVectorList; []ⱽᴸ; _∷ⱽᴸ_)
-
 private
   variable
     ℓ : Level
@@ -401,9 +399,6 @@ data M_∶_×_ (A : Set ℓ) ⦃ F : Field A ⦄ (m n : ℕ) : Set ℓ where
                → ⟨ x , M ·ˡᵐ y ⟩ ≡ ⟨ y , Mᵀ ·ˡᵐ x ⟩ )
           → M A ∶ m × n
 
-extractLinearMap : ⦃ F : Field A ⦄ → M A ∶ m × n → LinearMap A n m
-extractLinearMap ⟦ M , Mᵀ , p ⟧ = M
-
 _ᵀ : ⦃ F : Field A ⦄ → M A ∶ m × n → M A ∶ n × m
 ⟦ f , a , p ⟧ ᵀ = ⟦ a , f , (λ x y → sym (p y x)) ⟧
 
@@ -505,6 +500,14 @@ I = ⟦ idₗₘ , idₗₘ , id-transpose  ⟧
 sym-sym : {x y : A} (p : x ≡ y) → sym (sym p) ≡ p
 sym-sym refl = refl
 
+-- I'd like to prove this but don't know how! T_T
+-- Actually I'd like to say all proofs of type p are equivalent.
+z : ⦃ F : Field A ⦄
+  → (M : LinearMap A n m ) → (Mᵀ : LinearMap A m n )
+  → (p : (x : Vec A m) → (y : Vec A n) → ⟨ x , M ·ˡᵐ y ⟩ ≡ ⟨ y , Mᵀ ·ˡᵐ x ⟩)
+  → (λ x y → sym (sym (p x y))) ≡ (λ x y → p x y)
+z M Mᵀ p = {!!}
+
 -- Hmm, maybe adding the proof into the constructor was a poor idea, as
 -- these proofs seem tricky. Although I need the proofs to construct *ᴹ and
 -- +ᴹ proofs correct.
@@ -515,11 +518,11 @@ sym-sym refl = refl
 -- ᵀ-distr-* : {A : Set} ⦃ F : Field A ⦄ → (L : M A ∶ m × n) (R : M A ∶ n × p)
 --           → (L *ᴹ R) ᵀ ≡ (R ᵀ *ᴹ L ᵀ)
 -- ᵀ-distr-* L R = {!!}
---
+
 -- ᵀ-distr-+ : {A : Set} ⦃ F : Field A ⦄
 --           → (L : M A ∶ m × n) (R : M A ∶ m × n)
---           → (L + R) ᵀ ≡ (L ᵀ + R ᵀ)
--- ᵀ-distr-+ L R rewrite idᵀᵀ L | idᵀᵀ R = refl
+--           → (L +ᴹ R) ᵀ ≡ (L ᵀ +ᴹ R ᵀ)
+-- ᵀ-distr-+ L R = {!!}
 
 -- I-idempotent : {A : Set} {n : ℕ} ⦃ F : Field A ⦄ → (I {A} {n} ⦃ F ⦄) *ᴹ I ≡ I
 -- I-idempotent = {!!}
