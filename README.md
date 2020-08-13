@@ -36,7 +36,7 @@ jupyter-notebook
 
 A comparison for this implementation with a dependently typed language (Agda)
 is provided in the
-[ryanorendorff/functional-linear-algebra](https://github.io/ryanorendorff/functional-linear-algebra)
+[ryanorendorff/functional-linear-algebra](https://github.com/ryanorendorff/functional-linear-algebra)
 repo. Some functions that can be typed in Agda that do not yet have their
 implementation in Haskell are provided in order to determine what might be
 needed to implement the given function. Below is a list of functions that
