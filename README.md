@@ -35,10 +35,12 @@ jupyter-notebook
 ## Comparison with Agda
 
 A comparison for this implementation with a dependently typed language (Agda)
-is provided in `agda-comparison`. Some functions that can be typed in Agda that
-do not yet have their implementation in Haskell are provided in order to
-determine what might be needed to implement the given function. Below is a list
-of functions that currently have an implementation in Agda but not in Haskell.
+is provided in the
+[ryanorendorff/functional-linear-algebra](https://github.io/ryanorendorff/functional-linear-algebra)
+repo. Some functions that can be typed in Agda that do not yet have their
+implementation in Haskell are provided in order to determine what might be
+needed to implement the given function. Below is a list of functions that
+currently have an implementation in Agda but not in Haskell.
 
 - `splitToVectorList : {A : Set} → (ns : List ℕ) → Vec A (sum ns) → VectorList A ns`
 

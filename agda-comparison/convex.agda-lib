@@ -1,4 +1,0 @@
-name: vector-list
-depend: standard-library
-include: .
-
